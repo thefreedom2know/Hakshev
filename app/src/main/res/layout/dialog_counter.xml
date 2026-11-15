@@ -21,4 +21,18 @@
         android:id="@+id/spPeriod"
         android:layout_width="match_parent"
         android:layout_height="56dp" />
+
+    <LinearLayout
+        android:id="@+id/formConvert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical" />
+
+    <CheckBox
+        android:id="@+id/cbAll"
+        style="@style/HkBody"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="@string/add_whole_company" />
 </LinearLayout>

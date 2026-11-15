@@ -46,6 +46,9 @@ public interface AppDao {
     @Query("SELECT * FROM counters ORDER BY name")
     List<CounterDef> counters();
 
+    @Query("SELECT * FROM counters WHERE name = :name LIMIT 1")
+    CounterDef counterByName(String name);
+
     @Query("SELECT * FROM counters WHERE id = :id")
     CounterDef counter(long id);
 

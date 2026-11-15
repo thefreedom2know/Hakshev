@@ -77,7 +77,14 @@
     <string name="plus_all">+1 לכולם</string>
     <string name="confirm_plus_all">להוסיף 1 לכל %1$d החיילים בספירה?</string>
     <string name="add_members">הוסף חיילים</string>
-    <string name="members_all">כל מי שעוד לא בספירה (%1$d)</string>
+    <string name="members_all">כל הפלוגה (מי שעוד לא בספירה: %1$d)</string>
+    <string name="add_whole_company">הוסף את כל הפלוגה לספירה</string>
+    <string name="label_convert_at">המרה: כמה בספירה הזו הופכים לעונש אחר (0 = בלי המרה)</string>
+    <string name="label_convert_to">שם הספירה / העונש שמקבלים בהמרה (נוצר אוטומטית אם אין)</string>
+    <string name="conversion_info">המרה: %1$d כאן הופכים ל-1 ב"%2$s"</string>
+    <string name="note_converted_to">הומר ל"%1$s"</string>
+    <string name="note_converted_from">הומר מ-%1$d ב"%2$s"</string>
+    <string name="converted_message">%1$s: %2$d ב"%3$s" הומרו ל-%4$d ב"%5$s"</string>
     <string name="members_squad">כל %1$s (%2$d)</string>
     <string name="members_manual">בחירה ידנית…</string>
     <string name="no_members">אין חיילים בספירה. לחץ "הוסף חיילים".</string>
@@ -94,6 +101,7 @@
         <item>שעות ביציאה|TOTAL|0|שעות</item>
         <item>שמירות נוספות|WEEK|0|</item>
         <item>מבחנים שעברו|TOTAL|0|</item>
+        <item>סש"ט|TOTAL|0|</item>
         <item>עונשים והערות משמעת|TOTAL|0|</item>
         <item>נוכחות בשיעורים|WEEK|0|</item>
     </string-array>

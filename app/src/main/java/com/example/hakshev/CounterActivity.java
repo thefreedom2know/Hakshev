@@ -41,10 +41,8 @@ public class CounterActivity extends BaseActivity {
             @Override
             public void onDelta(Counters.Row row, int delta) {
                 CounterEntry e = Dialogs.entry(CounterActivity.this, counterId, row.soldierId, delta);
-                Db.IO.execute(() -> {
-                    Db.dao(CounterActivity.this).insertEntry(e);
-                    reload();
-                });
+                Counters.addEntries(CounterActivity.this, java.util.Collections.singletonList(e),
+                        CounterActivity.this::reload);
             }
 
             @Override
@@ -92,11 +90,16 @@ public class CounterActivity extends BaseActivity {
         }
         List<Soldier> m = Db.dao(this).members(counterId);
         List<Counters.Row> rows = Counters.memberRows(this, d, m, System.currentTimeMillis());
+        CounterDef target = d.convertToId != 0 ? Db.dao(this).counter(d.convertToId) : null;
         runOnUiThread(() -> {
             def = d;
             members = m;
             tvTitle.setText(d.name + " (" + Periods.label(this, d.period) + ")");
-            tvRange.setText(getString(R.string.period_range, Periods.rangeText(this, d, System.currentTimeMillis())));
+            String range = getString(R.string.period_range, Periods.rangeText(this, d, System.currentTimeMillis()));
+            if (target != null && d.convertAt > 0) {
+                range += "\n" + getString(R.string.conversion_info, d.convertAt, target.name);
+            }
+            tvRange.setText(range);
             adapter.setItems(rows);
         });
     }
@@ -111,10 +114,7 @@ public class CounterActivity extends BaseActivity {
                 .setPositiveButton(R.string.yes, (d, w) -> {
                     List<CounterEntry> entries = new ArrayList<>();
                     for (Soldier s : members) entries.add(Dialogs.entry(this, counterId, s.id, 1));
-                    Db.IO.execute(() -> {
-                        Db.dao(this).insertEntries(entries);
-                        reload();
-                    });
+                    Counters.addEntries(this, entries, this::reload);
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();

@@ -80,10 +80,8 @@ public class SoldierActivity extends BaseActivity {
             @Override
             public void onDelta(Counters.Row row, int delta) {
                 CounterEntry e = Dialogs.entry(SoldierActivity.this, row.counterId, soldierId, delta);
-                Db.IO.execute(() -> {
-                    Db.dao(SoldierActivity.this).insertEntry(e);
-                    loadCounters();
-                });
+                Counters.addEntries(SoldierActivity.this, java.util.Collections.singletonList(e),
+                        SoldierActivity.this::loadCounters);
             }
 
             @Override

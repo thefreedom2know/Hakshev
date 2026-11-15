@@ -54,3 +54,9 @@ Open the folder in Android Studio, or:
 ```
 ./gradlew assembleDebug
 ```
+
+## Conversion rule
+A counter can convert into another one, e.g. 3 of "סש"ט" become 1 of "another punishment":
+set "המרה" on the first counter. When a soldier reaches the number, that many are taken off and he
+gets 1 in the target counter (created automatically if it does not exist). Deleting an entry later
+does not undo a conversion.

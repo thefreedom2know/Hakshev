@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.text.InputType;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -55,8 +56,28 @@ public final class Dialogs {
 
     private static void counterForm(Activity a, CounterDef def, boolean isNew,
                                     LongConsumer onSaved, Runnable onDeleted) {
+        if (def.convertToId == 0) {
+            showCounterForm(a, def, "", isNew, onSaved, onDeleted);
+            return;
+        }
+        // Look up the name of the counter this one converts into.
+        Db.IO.execute(() -> {
+            CounterDef target = Db.dao(a).counter(def.convertToId);
+            String name = target == null ? "" : target.name;
+            a.runOnUiThread(() -> showCounterForm(a, def, name, isNew, onSaved, onDeleted));
+        });
+    }
+
+    private static void showCounterForm(Activity a, CounterDef def, String convertName, boolean isNew,
+                                        LongConsumer onSaved, Runnable onDeleted) {
         View v = a.getLayoutInflater().inflate(R.layout.dialog_counter, null);
         ViewGroup form = v.findViewById(R.id.form);
+        ViewGroup formConvert = v.findViewById(R.id.formConvert);
+        CheckBox cbAll = v.findViewById(R.id.cbAll);
+        cbAll.setVisibility(isNew ? View.VISIBLE : View.GONE);
+        EditText etConvertAt = Ui.addField(a, formConvert, R.string.label_convert_at,
+                def.convertAt > 0 ? String.valueOf(def.convertAt) : "", NUMBER);
+        EditText etConvertTo = Ui.addField(a, formConvert, R.string.label_convert_to, convertName, TEXT);
         Spinner spPeriod = v.findViewById(R.id.spPeriod);
         EditText etName = Ui.addField(a, form, R.string.label_counter_name, def.name, TEXT);
         EditText etUnit = Ui.addField(a, form, R.string.label_counter_unit, def.unit, TEXT);
@@ -79,10 +100,34 @@ public final class Dialogs {
                     def.target = Math.max(0, Ui.parseInt(etTarget.getText(), 0));
                     def.period = Periods.ALL[Math.max(0, spPeriod.getSelectedItemPosition())];
                     if (def.createdAt == 0) def.createdAt = System.currentTimeMillis();
+                    int convertAt = Math.max(0, Ui.parseInt(etConvertAt.getText(), 0));
+                    String convertTo = etConvertTo.getText().toString().trim();
+                    boolean everyone = cbAll.isChecked();
                     Db.IO.execute(() -> {
+                        AppDao dao = Db.dao(a);
+                        // Conversion: reuse the counter with that name, or create it.
+                        def.convertAt = 0;
+                        def.convertToId = 0;
+                        if (convertAt > 0 && !convertTo.isEmpty() && !convertTo.equals(def.name)) {
+                            CounterDef target = dao.counterByName(convertTo);
+                            if (target == null) {
+                                target = new CounterDef();
+                                target.name = convertTo;
+                                target.period = Periods.TOTAL;
+                                target.createdAt = System.currentTimeMillis();
+                                target.id = dao.insertCounter(target);
+                            }
+                            def.convertAt = convertAt;
+                            def.convertToId = target.id;
+                        }
                         long id = def.id;
-                        if (isNew) id = Db.dao(a).insertCounter(def);
-                        else Db.dao(a).updateCounter(def);
+                        if (isNew) id = dao.insertCounter(def);
+                        else dao.updateCounter(def);
+                        if (isNew && everyone) {
+                            List<CounterMember> all = new ArrayList<>();
+                            for (Soldier s : dao.allSoldiers()) all.add(new CounterMember(id, s.id));
+                            dao.addMembers(all);
+                        }
                         final long finalId = id;
                         a.runOnUiThread(() -> onSaved.accept(finalId));
                     });
@@ -118,10 +163,8 @@ public final class Dialogs {
                     if (amount == 0) return;
                     CounterEntry e = entry(a, def.id, s.id, amount);
                     e.note = etNote.getText().toString().trim();
-                    Db.IO.execute(() -> {
-                        Db.dao(a).insertEntry(e);
-                        a.runOnUiThread(onDone);
-                    });
+                    Counters.addEntries(a, java.util.Collections.singletonList(e),
+                            () -> a.runOnUiThread(onDone));
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();

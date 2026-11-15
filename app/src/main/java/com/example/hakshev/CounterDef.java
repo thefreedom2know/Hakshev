@@ -1,5 +1,6 @@
 package com.example.hakshev;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -17,4 +18,13 @@ public class CounterDef {
     /** Optional unit label, e.g. "שעות". */
     public String unit = "";
     public long createdAt;
+
+    /**
+     * Conversion rule: when a soldier reaches this many in the current period, they are taken
+     * off and he gets 1 of the counter {@link #convertToId} instead. 0 = no rule.
+     */
+    @ColumnInfo(defaultValue = "0")
+    public int convertAt;
+    @ColumnInfo(defaultValue = "0")
+    public long convertToId;
 }

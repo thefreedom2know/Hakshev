@@ -5,6 +5,8 @@ import android.content.Context;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory;
 
@@ -16,7 +18,7 @@ import java.util.concurrent.Executors;
         entities = {
                 Soldier.class, CounterDef.class, CounterMember.class, CounterEntry.class,
                 Duty.class, ChecklistTemplate.class, InspectionRun.class},
-        version = 2,
+        version = 3,
         exportSchema = false)
 public abstract class Db extends RoomDatabase {
     public abstract AppDao dao();
@@ -24,6 +26,15 @@ public abstract class Db extends RoomDatabase {
     public static final ExecutorService IO = Executors.newSingleThreadExecutor();
 
     private static volatile Db instance;
+
+    /** Adds the conversion rule to counters. Existing data is kept. */
+    private static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+        @Override
+        public void migrate(SupportSQLiteDatabase db) {
+            db.execSQL("ALTER TABLE counters ADD COLUMN convertAt INTEGER NOT NULL DEFAULT 0");
+            db.execSQL("ALTER TABLE counters ADD COLUMN convertToId INTEGER NOT NULL DEFAULT 0");
+        }
+    };
 
     public static Db get(Context c) {
         if (instance == null) {
@@ -38,6 +49,7 @@ public abstract class Db extends RoomDatabase {
                             // Version 1 was a development build that never shipped.
                             // From version 2 on, real migrations must be written.
                             .fallbackToDestructiveMigrationFrom(true, 1)
+                            .addMigrations(MIGRATION_2_3)
                             .build();
                 }
             }

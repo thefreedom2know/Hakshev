@@ -1,6 +1,8 @@
 package com.example.hakshev;
 
+import android.app.Activity;
 import android.content.Context;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,6 +77,70 @@ public final class Counters {
             rows.add(r);
         }
         return rows;
+    }
+
+    /**
+     * Saves entries and applies conversion rules (e.g. 3 of "A" become 1 of "B"). Runs the work
+     * on {@link Db#IO}, shows a message for every conversion, then runs {@code afterOnIo}
+     * (still on the IO thread) so the caller can reload.
+     */
+    public static void addEntries(Activity a, List<CounterEntry> entries, Runnable afterOnIo) {
+        Db.IO.execute(() -> {
+            StringBuilder msgs = new StringBuilder();
+            for (CounterEntry e : entries) {
+                String m = addEntry(a, e);
+                if (m != null) msgs.append(m).append("\n");
+            }
+            if (msgs.length() > 0) {
+                String text = msgs.toString().trim();
+                a.runOnUiThread(() -> Toast.makeText(a, text, Toast.LENGTH_LONG).show());
+            }
+            if (afterOnIo != null) afterOnIo.run();
+        });
+    }
+
+    /** IO thread. Returns a message when a conversion happened, otherwise null. */
+    private static String addEntry(Context c, CounterEntry e) {
+        AppDao dao = Db.dao(c);
+        dao.insertEntry(e);
+        if (e.delta <= 0) return null;
+        CounterDef def = dao.counter(e.counterId);
+        if (def == null || def.convertAt <= 0 || def.convertToId == 0 || def.convertToId == def.id) return null;
+        CounterDef target = dao.counter(def.convertToId);
+        if (target == null) return null;
+
+        long[] r = Periods.range(def.period, def.createdAt, e.createdAt, 0);
+        int total = dao.total(def.id, e.soldierId, r[0], r[1]);
+        int conversions = 0;
+        while (total >= def.convertAt) {
+            CounterEntry out = new CounterEntry();
+            out.counterId = def.id;
+            out.soldierId = e.soldierId;
+            out.delta = -def.convertAt;
+            out.note = c.getString(R.string.note_converted_to, target.name);
+            out.recordedBy = e.recordedBy;
+            out.createdAt = e.createdAt;
+            dao.insertEntry(out);
+
+            CounterEntry in = new CounterEntry();
+            in.counterId = target.id;
+            in.soldierId = e.soldierId;
+            in.delta = 1;
+            in.note = c.getString(R.string.note_converted_from, def.convertAt, def.name);
+            in.recordedBy = e.recordedBy;
+            in.createdAt = e.createdAt;
+            dao.insertEntry(in);
+
+            total -= def.convertAt;
+            conversions++;
+        }
+        if (conversions == 0) return null;
+        List<CounterMember> membership = new ArrayList<>();
+        membership.add(new CounterMember(target.id, e.soldierId));
+        dao.addMembers(membership);
+        Soldier s = dao.soldier(e.soldierId);
+        return c.getString(R.string.converted_message, s == null ? "" : s.fullName,
+                def.convertAt * conversions, def.name, conversions, target.name);
     }
 
     /** Sum over the members of the counter in the current period. */
