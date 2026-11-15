@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:text="@string/label_period" />
 
-    <Spinner
+    <Spinner style="@style/HkSpinner"
         android:id="@+id/spPeriod"
         android:layout_width="match_parent"
         android:layout_height="56dp" />

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true">
@@ -10,126 +11,320 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            style="@style/HkTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/dashboard_title" />
-
-        <TextView
-            android:id="@+id/tvDate"
-            style="@style/HkBody"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
+        <!-- Hero -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal"
-            android:weightSum="3">
+            android:background="@drawable/bg_hero"
+            android:elevation="4dp"
+            android:orientation="vertical"
+            android:padding="22dp">
 
-            <com.google.android.material.card.MaterialCardView
-                style="@style/HkCard"
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/tvGreeting"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="4dp"
-                android:layout_weight="1">
+                android:fontFamily="sans-serif-medium"
+                android:textColor="#FFFFFF"
+                android:textSize="22sp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="8dp">
-
-                    <TextView
-                        android:id="@+id/tvHeadcount"
-                        style="@style/HkBody"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:textSize="28sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        style="@style/HkBody"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="@string/metric_headcount"
-                        android:textSize="14sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                style="@style/HkCard"
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/tvDate"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
-                android:layout_weight="1">
+                android:textColor="#D9FFFFFF"
+                android:textSize="14sp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="8dp">
-
-                    <TextView
-                        android:id="@+id/tvCounterCount"
-                        style="@style/HkBody"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:textSize="28sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        style="@style/HkBody"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="@string/metric_counters"
-                        android:textSize="14sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                style="@style/HkCard"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_weight="1">
+                android:layout_marginTop="18dp"
+                android:baselineAligned="false"
+                android:gravity="bottom"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/tvHeadcount"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="8dp">
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="#FFFFFF"
+                    android:textSize="52sp"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/tvAlertCount"
-                        style="@style/HkBody"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:textColor="@color/hk_alert"
-                        android:textSize="28sp"
-                        android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:text="@string/hero_present"
+                    android:textColor="#D9FFFFFF"
+                    android:textSize="18sp" />
+            </LinearLayout>
 
-                    <TextView
-                        style="@style/HkBody"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="@string/metric_alerts"
-                        android:textSize="14sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/progressHeadcount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:indicatorColor="#FFFFFF"
+                app:trackColor="#40FFFFFF"
+                app:trackCornerRadius="6dp"
+                app:trackThickness="10dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvCounterCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_glass_pill"
+                    android:paddingStart="16dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="8dp"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/tvAlertCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_glass_pill"
+                    android:paddingStart="16dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="8dp"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp" />
+            </LinearLayout>
         </LinearLayout>
 
+        <!-- Tiles -->
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:columnCount="2">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnCounters"
+                style="@style/HkCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="6dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="112dp"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔢"
+                        android:textSize="34sp" />
+
+                    <TextView
+                        style="@style/HkBody"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/tile_counters"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnRoster"
+                style="@style/HkCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="6dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="112dp"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="👥"
+                        android:textSize="34sp" />
+
+                    <TextView
+                        style="@style/HkBody"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/tile_roster"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnDuties"
+                style="@style/HkCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="6dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="112dp"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🛡️"
+                        android:textSize="34sp" />
+
+                    <TextView
+                        style="@style/HkBody"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/tile_duties"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnInspections"
+                style="@style/HkCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="6dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="112dp"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="✅"
+                        android:textSize="34sp" />
+
+                    <TextView
+                        style="@style/HkBody"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/tile_inspections"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnReport"
+                style="@style/HkCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="6dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="112dp"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📋"
+                        android:textSize="34sp" />
+
+                    <TextView
+                        style="@style/HkBody"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/tile_report"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnSettings"
+                style="@style/HkCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="6dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="112dp"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⚙️"
+                        android:textSize="34sp" />
+
+                    <TextView
+                        style="@style/HkBody"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/tile_settings"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </GridLayout>
+
         <TextView
-            style="@style/HkTitle"
+            style="@style/HkSection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/nav_counters" />
@@ -144,15 +339,15 @@
                 style="@style/HkBody"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="12dp" />
+                android:lineSpacingExtra="4dp"
+                android:padding="16dp" />
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
-            style="@style/HkTitle"
+            style="@style/HkSection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/alerts_title"
-            android:textColor="@color/hk_alert" />
+            android:text="@string/alerts_title" />
 
         <com.google.android.material.card.MaterialCardView
             style="@style/HkCard"
@@ -164,68 +359,8 @@
                 style="@style/HkBody"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="12dp" />
+                android:lineSpacingExtra="4dp"
+                android:padding="16dp" />
         </com.google.android.material.card.MaterialCardView>
-
-        <TextView
-            style="@style/HkTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/quick_actions" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCounters"
-            style="@style/HkButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/nav_counters" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnNewInspection"
-            style="@style/HkButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/new_inspection" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnReport"
-            style="@style/HkButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/copy_report" />
-
-        <TextView
-            style="@style/HkTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/screens_title" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRoster"
-            style="@style/HkButtonOutlined"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/nav_roster" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnDuties"
-            style="@style/HkButtonOutlined"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/nav_duties" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnInspections"
-            style="@style/HkButtonOutlined"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/nav_inspections" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSettings"
-            style="@style/HkButtonOutlined"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/nav_settings" />
     </LinearLayout>
 </ScrollView>

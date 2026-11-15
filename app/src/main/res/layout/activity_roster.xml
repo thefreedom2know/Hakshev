@@ -16,16 +16,18 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <Spinner
+        <Spinner style="@style/HkSpinner"
             android:id="@+id/spSquad"
             android:layout_width="0dp"
             android:layout_height="56dp"
+            android:layout_marginEnd="6dp"
             android:layout_weight="1" />
 
-        <Spinner
+        <Spinner style="@style/HkSpinner"
             android:id="@+id/spStatus"
             android:layout_width="0dp"
             android:layout_height="56dp"
+            android:layout_marginStart="6dp"
             android:layout_weight="1" />
     </LinearLayout>
 
@@ -44,14 +46,14 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnBulkPresent"
-        style="@style/HkButton"
+        style="@style/HkButtonOutlined"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/bulk_present" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnAdd"
-        style="@style/HkButtonOutlined"
+        style="@style/HkButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/add_soldier" />

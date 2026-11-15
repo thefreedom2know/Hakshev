@@ -5,12 +5,12 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <Spinner
+    <Spinner style="@style/HkSpinner"
         android:id="@+id/spSoldier"
         android:layout_width="match_parent"
         android:layout_height="56dp" />
 
-    <Spinner
+    <Spinner style="@style/HkSpinner"
         android:id="@+id/spDuty"
         android:layout_width="match_parent"
         android:layout_height="56dp" />

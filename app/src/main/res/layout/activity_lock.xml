@@ -2,38 +2,55 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bg_hero"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="32dp">
 
     <TextView
-        style="@style/HkTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="🔒"
+        android:textSize="64sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-medium"
         android:text="@string/app_name"
-        android:textSize="32sp" />
+        android:textColor="#FFFFFF"
+        android:textSize="34sp"
+        android:textStyle="bold" />
 
     <TextView
-        style="@style/HkBody"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/enter_pin" />
+        android:layout_marginTop="4dp"
+        android:text="@string/enter_pin"
+        android:textColor="#D9FFFFFF"
+        android:textSize="18sp" />
 
     <EditText
         android:id="@+id/etPin"
-        style="@style/HkBody"
-        android:layout_width="220dp"
+        android:layout_width="240dp"
         android:layout_height="64dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/bg_glass_pill"
         android:gravity="center"
         android:importantForAutofill="no"
         android:inputType="numberPassword"
         android:maxLength="12"
-        android:textSize="28sp" />
+        android:textColor="#FFFFFF"
+        android:textSize="30sp" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnUnlock"
         style="@style/HkButton"
-        android:layout_width="220dp"
+        android:layout_width="240dp"
         android:layout_height="wrap_content"
-        android:text="@string/unlock" />
+        android:layout_marginTop="16dp"
+        android:backgroundTint="#FFFFFF"
+        android:text="@string/unlock"
+        android:textColor="#312E81" />
 </LinearLayout>

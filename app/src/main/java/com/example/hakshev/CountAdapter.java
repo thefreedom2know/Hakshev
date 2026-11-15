@@ -50,6 +50,14 @@ public class CountAdapter extends RecyclerView.Adapter<CountAdapter.VH> {
     public void onBindViewHolder(@NonNull VH h, int position) {
         Counters.Row r = items.get(position);
         h.title.setText(r.title);
+        Ui.avatar(h.avatar, r.avatarText, r.avatarText);
+        if (r.target > 0) {
+            h.progress.setVisibility(View.VISIBLE);
+            h.progress.setMax(r.target);
+            h.progress.setProgressCompat(Math.max(0, Math.min(r.value, r.target)), false);
+        } else {
+            h.progress.setVisibility(View.GONE);
+        }
         h.sub.setText(r.sub);
         h.sub.setVisibility(r.sub.isEmpty() ? View.GONE : View.VISIBLE);
         h.value.setText(r.valueText);
@@ -71,11 +79,14 @@ public class CountAdapter extends RecyclerView.Adapter<CountAdapter.VH> {
     }
 
     static class VH extends RecyclerView.ViewHolder {
-        final TextView title, sub, value;
+        final TextView title, sub, value, avatar;
+        final com.google.android.material.progressindicator.LinearProgressIndicator progress;
         final MaterialButton minus, plus;
 
         VH(View v) {
             super(v);
+            avatar = v.findViewById(R.id.tvAvatar);
+            progress = v.findViewById(R.id.progress);
             title = v.findViewById(R.id.tvTitle);
             sub = v.findViewById(R.id.tvSub);
             value = v.findViewById(R.id.tvValue);

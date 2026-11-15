@@ -21,6 +21,10 @@ public final class Counters {
         public String sub = "";
         public String valueText = "";
         public boolean reached;
+        public int value;
+        public int target;
+        /** What to show in the colored circle: soldier name or counter name. */
+        public String avatarText = "";
     }
 
     public static String valueText(CounterDef def, int value) {
@@ -49,6 +53,9 @@ public final class Counters {
             r.counterId = def.id;
             r.soldierId = s.id;
             r.title = s.fullName;
+            r.avatarText = s.fullName;
+            r.value = v;
+            r.target = def.target;
             r.valueText = valueText(def, v);
             r.reached = def.target > 0 && v >= def.target;
             if (prevMap != null) r.sub = previousText(c, def, get(prevMap, s.id));
@@ -68,6 +75,9 @@ public final class Counters {
             r.counterId = def.id;
             r.soldierId = s.id;
             r.title = def.name + " (" + Periods.label(c, def.period) + ")";
+            r.avatarText = def.name;
+            r.value = v;
+            r.target = def.target;
             r.valueText = valueText(def, v);
             r.reached = def.target > 0 && v >= def.target;
             if (!Periods.TOTAL.equals(def.period)) {

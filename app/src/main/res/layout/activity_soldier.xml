@@ -10,89 +10,44 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tvTitle"
-            style="@style/HkTitle"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvAvatar"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTitle"
+                style="@style/HkTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tvAlertBanner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/hk_alert"
-            android:padding="12dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_alert"
+            android:padding="14dp"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold"
             android:visibility="gone" />
 
         <TextView
-            style="@style/HkTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/section_personal" />
-
-        <LinearLayout
-            android:id="@+id/formPersonal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
-
-        <TextView
-            style="@style/HkBody"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/label_squad" />
-
-        <Spinner
-            android:id="@+id/spSquad"
-            android:layout_width="match_parent"
-            android:layout_height="56dp" />
-
-        <TextView
-            style="@style/HkBody"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/label_status" />
-
-        <Spinner
-            android:id="@+id/spStatus"
-            android:layout_width="match_parent"
-            android:layout_height="56dp" />
-
-        <TextView
-            style="@style/HkTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/section_medical" />
-
-        <LinearLayout
-            android:id="@+id/formMedical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnExpiry"
-            style="@style/HkButtonOutlined"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            style="@style/HkTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/section_equipment" />
-
-        <LinearLayout
-            android:id="@+id/formEquipment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
-
-        <TextView
-            style="@style/HkTitle"
+            style="@style/HkSection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/section_counters" />
@@ -102,6 +57,8 @@
             style="@style/HkBody"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:textColor="?attr/colorOnSurfaceVariant"
             android:text="@string/soldier_no_counters" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -117,12 +74,114 @@
             android:layout_height="wrap_content"
             android:text="@string/add_counter_to_soldier" />
 
+        <TextView
+            style="@style/HkSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/section_personal" />
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/HkCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:id="@+id/formPersonal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <TextView
+                    style="@style/HkBody"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/label_squad"
+                    android:textSize="15sp" />
+
+                <Spinner style="@style/HkSpinner"
+                    android:id="@+id/spSquad"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp" />
+
+                <TextView
+                    style="@style/HkBody"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/label_status"
+                    android:textSize="15sp" />
+
+                <Spinner style="@style/HkSpinner"
+                    android:id="@+id/spStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            style="@style/HkSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/section_medical" />
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/HkCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:id="@+id/formMedical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnExpiry"
+                    style="@style/HkButtonOutlined"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            style="@style/HkSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/section_equipment" />
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/HkCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/formEquipment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp" />
+        </com.google.android.material.card.MaterialCardView>
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSave"
             style="@style/HkButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             android:text="@string/save" />
 
         <com.google.android.material.button.MaterialButton
@@ -130,6 +189,7 @@
             style="@style/HkButtonOutlined"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:text="@string/delete_soldier"
             android:textColor="@color/hk_alert" />
     </LinearLayout>

@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:text="@string/nav_inspections" />
 
-    <Spinner
+    <Spinner style="@style/HkSpinner"
         android:id="@+id/spTemplate"
         android:layout_width="match_parent"
         android:layout_height="56dp" />

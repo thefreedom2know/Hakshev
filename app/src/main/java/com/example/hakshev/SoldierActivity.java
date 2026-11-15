@@ -37,7 +37,7 @@ public class SoldierActivity extends BaseActivity {
     private EditText etAllergies, etExemptions, etMeds, etWeapon, etEquipment, etNotes;
     private Spinner spSquad, spStatus;
     private MaterialButton btnExpiry;
-    private TextView tvBanner, tvTitle, tvNoCounters;
+    private TextView tvBanner, tvTitle, tvNoCounters, tvAvatar;
     private CountAdapter countAdapter;
     private List<CounterDef> myCounters = new ArrayList<>();
     private List<String> squads = new ArrayList<>();
@@ -49,6 +49,7 @@ public class SoldierActivity extends BaseActivity {
         soldierId = getIntent().getLongExtra(EXTRA_ID, 0);
 
         tvTitle = findViewById(R.id.tvTitle);
+        tvAvatar = findViewById(R.id.tvAvatar);
         tvBanner = findViewById(R.id.tvAlertBanner);
         tvNoCounters = findViewById(R.id.tvNoCounters);
         spSquad = findViewById(R.id.spSquad);
@@ -114,6 +115,7 @@ public class SoldierActivity extends BaseActivity {
 
         if (soldierId == 0) {
             tvTitle.setText(R.string.new_soldier);
+            Ui.avatar(tvAvatar, "+", "new");
             findViewById(R.id.btnDelete).setVisibility(View.GONE);
             findViewById(R.id.btnAddCounter).setVisibility(View.GONE);
             tvNoCounters.setText(R.string.save_first_for_counters);
@@ -147,6 +149,7 @@ public class SoldierActivity extends BaseActivity {
 
     private void populate() {
         tvTitle.setText(soldier.fullName);
+        Ui.avatar(tvAvatar, soldier.fullName, soldier.squad.isEmpty() ? soldier.fullName : soldier.squad);
         etName.setText(soldier.fullName);
         etPersonal.setText(soldier.personalNumber);
         etPhone.setText(soldier.phone);

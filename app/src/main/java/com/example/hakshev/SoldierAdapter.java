@@ -9,8 +9,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.button.MaterialButton;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,7 +57,9 @@ public class SoldierAdapter extends RecyclerView.Adapter<SoldierAdapter.VH> {
         h.badges.setText(badges);
         h.badges.setVisibility(badges.length() == 0 ? View.GONE : View.VISIBLE);
 
+        Ui.avatar(h.avatar, s.fullName, s.squad.isEmpty() ? s.fullName : s.squad);
         h.status.setText(Status.label(c, s.status));
+        Ui.chip(h.status, Ui.statusColor(s.status));
         h.itemView.setOnClickListener(v -> listener.onOpen(s));
         h.status.setOnClickListener(v -> listener.onStatus(s));
     }
@@ -70,11 +70,11 @@ public class SoldierAdapter extends RecyclerView.Adapter<SoldierAdapter.VH> {
     }
 
     static class VH extends RecyclerView.ViewHolder {
-        final TextView name, sub, badges;
-        final MaterialButton status;
+        final TextView name, sub, badges, avatar, status;
 
         VH(View v) {
             super(v);
+            avatar = v.findViewById(R.id.tvAvatar);
             name = v.findViewById(R.id.tvName);
             sub = v.findViewById(R.id.tvSub);
             badges = v.findViewById(R.id.tvBadges);

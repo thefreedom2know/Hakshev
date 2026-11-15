@@ -3,6 +3,7 @@
     style="@style/HkCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
     android:clickable="true"
     android:focusable="true">
 
@@ -11,7 +12,8 @@
         style="@style/HkBody"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="56dp"
         android:gravity="center_vertical|start"
-        android:padding="12dp" />
+        android:lineSpacingExtra="3dp"
+        android:minHeight="64dp"
+        android:padding="16dp" />
 </com.google.android.material.card.MaterialCardView>

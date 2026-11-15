@@ -16,6 +16,8 @@ import java.util.List;
 
 /** Dashboard: headcount, counters overview, exceptions and quick actions. */
 public class MainActivity extends BaseActivity {
+    private TextView tvGreeting;
+    private com.google.android.material.progressindicator.LinearProgressIndicator progressHeadcount;
     private TextView tvDate, tvHeadcount, tvCounterCount, tvAlertCount, tvAlerts, tvCounters;
     private List<Soldier> soldiers = new ArrayList<>();
 
@@ -23,6 +25,8 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        tvGreeting = findViewById(R.id.tvGreeting);
+        progressHeadcount = findViewById(R.id.progressHeadcount);
         tvDate = findViewById(R.id.tvDate);
         tvHeadcount = findViewById(R.id.tvHeadcount);
         tvCounterCount = findViewById(R.id.tvCounterCount);
@@ -30,9 +34,6 @@ public class MainActivity extends BaseActivity {
         tvAlerts = findViewById(R.id.tvAlerts);
         tvCounters = findViewById(R.id.tvCounters);
 
-        findViewById(R.id.btnNewInspection).setOnClickListener(v ->
-                startActivity(new Intent(this, InspectionActivity.class)
-                        .putExtra(InspectionActivity.EXTRA_AUTOSTART, true)));
         findViewById(R.id.btnReport).setOnClickListener(v -> chooseReport());
         findViewById(R.id.btnCounters).setOnClickListener(v -> startActivity(new Intent(this, CountersActivity.class)));
         findViewById(R.id.btnRoster).setOnClickListener(v -> startActivity(new Intent(this, RosterActivity.class)));
@@ -81,12 +82,16 @@ public class MainActivity extends BaseActivity {
     }
 
     private void render(int counterCount, String counterText) {
+        tvGreeting.setText(getString(R.string.greeting, Prefs.commander(this)));
         tvDate.setText(DateFormat.getDateInstance(DateFormat.FULL).format(new Date()));
-        tvHeadcount.setText(Alerts.headcount(soldiers) + "/" + soldiers.size());
-        tvCounterCount.setText(String.valueOf(counterCount));
+        int present = Alerts.headcount(soldiers);
+        tvHeadcount.setText(present + "/" + soldiers.size());
+        progressHeadcount.setMax(Math.max(1, soldiers.size()));
+        progressHeadcount.setProgressCompat(present, false);
+        tvCounterCount.setText(getString(R.string.hero_counters, counterCount));
         tvCounters.setText(counterText);
         List<String> alerts = Alerts.compute(this, soldiers);
-        tvAlertCount.setText(String.valueOf(alerts.size()));
+        tvAlertCount.setText(getString(R.string.hero_alerts, alerts.size()));
         if (alerts.isEmpty()) {
             tvAlerts.setText(R.string.no_alerts);
         } else {

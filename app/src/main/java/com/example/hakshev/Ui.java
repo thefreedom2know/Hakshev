@@ -1,12 +1,14 @@
 package com.example.hakshev;
 
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
@@ -64,6 +66,39 @@ public final class Ui {
 
     public static String date(long millis) {
         return new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date(millis));
+    }
+
+    private static final int[] PALETTE = {
+            0xFF6366F1, 0xFF14B8A6, 0xFFF59E0B, 0xFFEC4899,
+            0xFF3B82F6, 0xFF8B5CF6, 0xFF10B981, 0xFFEF4444};
+
+    /** Colored round avatar showing the first character (or emoji) of {@code text}. */
+    public static void avatar(TextView tv, String text, String colorKey) {
+        String t = text == null ? "" : text.trim();
+        String first = t.isEmpty() ? "?" : new String(Character.toChars(t.codePointAt(0)));
+        GradientDrawable g = new GradientDrawable();
+        g.setShape(GradientDrawable.OVAL);
+        g.setColor(PALETTE[Math.abs(colorKey.hashCode()) % PALETTE.length]);
+        tv.setBackground(g);
+        tv.setTextColor(0xFFFFFFFF);
+        tv.setText(first);
+    }
+
+    /** Rounded colored chip behind a status text. */
+    public static void chip(TextView tv, int color) {
+        GradientDrawable g = new GradientDrawable();
+        g.setCornerRadius(40f * tv.getResources().getDisplayMetrics().density);
+        g.setColor(color);
+        tv.setBackground(g);
+        tv.setTextColor(0xFFFFFFFF);
+    }
+
+    public static int statusColor(String status) {
+        if (Status.SICK.equals(status)) return 0xFFD97706;
+        if (Status.DUTY.equals(status)) return 0xFF4F46E5;
+        if (Status.LEAVE.equals(status)) return 0xFF6B7280;
+        if (Status.PROBLEM.equals(status)) return 0xFFDC2626;
+        return 0xFF16A34A;
     }
 
     public static int parseInt(CharSequence s, int fallback) {

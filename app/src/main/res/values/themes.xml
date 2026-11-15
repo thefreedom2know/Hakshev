@@ -1,31 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Theme.Hakshev" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/hk_primary</item>
         <item name="colorOnPrimary">@color/hk_on_primary</item>
+        <item name="colorPrimaryContainer">@color/hk_container</item>
+        <item name="colorOnPrimaryContainer">@color/hk_on_container</item>
         <item name="colorSecondary">@color/hk_primary</item>
         <item name="colorOnSecondary">@color/hk_on_primary</item>
+        <item name="colorSecondaryContainer">@color/hk_container</item>
+        <item name="colorOnSecondaryContainer">@color/hk_on_container</item>
         <item name="android:colorBackground">@color/hk_bg</item>
         <item name="colorSurface">@color/hk_surface</item>
         <item name="colorOnSurface">@color/hk_text</item>
         <item name="colorOnBackground">@color/hk_text</item>
-        <item name="colorSurfaceVariant">@color/hk_surface</item>
-        <item name="colorOnSurfaceVariant">@color/hk_text</item>
+        <item name="colorSurfaceVariant">@color/hk_container</item>
+        <item name="colorOnSurfaceVariant">@color/hk_muted</item>
         <item name="colorOutline">@color/hk_outline</item>
+        <item name="colorOutlineVariant">@color/hk_outline</item>
         <item name="colorError">@color/hk_alert</item>
+        <item name="colorSurfaceContainerLowest">@color/hk_surface</item>
+        <item name="colorSurfaceContainerLow">@color/hk_surface</item>
+        <item name="colorSurfaceContainer">@color/hk_surface</item>
+        <item name="colorSurfaceContainerHigh">@color/hk_surface</item>
+        <item name="colorSurfaceContainerHighest">@color/hk_surface</item>
         <item name="android:textColorPrimary">@color/hk_text</item>
-        <item name="android:textColorSecondary">@color/hk_text</item>
+        <item name="android:textColorSecondary">@color/hk_muted</item>
         <item name="android:statusBarColor">@color/hk_bg</item>
         <item name="android:navigationBarColor">@color/hk_bg</item>
+        <item name="android:windowLightStatusBar">@bool/hk_light_bars</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">@bool/hk_light_bars</item>
         <item name="materialButtonStyle">@style/HkButton</item>
     </style>
 
+    <!-- Screen title -->
     <style name="HkTitle" parent="">
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">28sp</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textColor">?attr/colorOnBackground</item>
-        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingTop">8dp</item>
         <item name="android:paddingBottom">8dp</item>
+    </style>
+
+    <!-- Section header inside a screen -->
+    <style name="HkSection" parent="">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">6dp</item>
     </style>
 
     <style name="HkBody" parent="">
@@ -33,43 +57,58 @@
         <item name="android:textColor">?attr/colorOnBackground</item>
     </style>
 
-    <!-- Big touch targets: at least 56dp high -->
+    <!-- Filled pill button, 56dp high -->
     <style name="HkButton" parent="Widget.Material3.Button">
         <item name="android:minHeight">56dp</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
-        <item name="android:layout_marginTop">4dp</item>
-        <item name="android:layout_marginBottom">4dp</item>
+        <item name="cornerRadius">28dp</item>
     </style>
 
-    <style name="HkButtonOutlined" parent="Widget.Material3.Button.OutlinedButton">
+    <!-- Tonal (secondary) pill button -->
+    <style name="HkButtonOutlined" parent="Widget.Material3.Button.TonalButton">
         <item name="android:minHeight">56dp</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
-        <item name="strokeColor">?attr/colorOutline</item>
-        <item name="strokeWidth">2dp</item>
+        <item name="cornerRadius">28dp</item>
     </style>
 
-    <!-- Square +/- buttons -->
-    <style name="HkStepButton" parent="Widget.Material3.Button">
-        <item name="android:minWidth">56dp</item>
-        <item name="android:minHeight">56dp</item>
-        <item name="android:layout_width">56dp</item>
-        <item name="android:layout_height">56dp</item>
+    <!-- Round +/- buttons -->
+    <style name="HkStepButton" parent="Widget.Material3.Button.TonalButton">
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
         <item name="android:insetLeft">0dp</item>
         <item name="android:insetRight">0dp</item>
         <item name="android:padding">0dp</item>
         <item name="android:textSize">26sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="cornerRadius">28dp</item>
     </style>
 
-    <style name="HkCard" parent="Widget.Material3.CardView.Outlined">
-        <item name="strokeColor">?attr/colorOutline</item>
-        <item name="strokeWidth">1dp</item>
+    <style name="HkCard" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">22dp</item>
+        <item name="cardElevation">2dp</item>
         <item name="cardBackgroundColor">?attr/colorSurface</item>
-        <item name="android:layout_marginBottom">8dp</item>
+        <item name="strokeColor">@color/hk_card_stroke</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <style name="HkField" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">16dp</item>
+        <item name="boxCornerRadiusTopEnd">16dp</item>
+        <item name="boxCornerRadiusBottomStart">16dp</item>
+        <item name="boxCornerRadiusBottomEnd">16dp</item>
+    </style>
+
+    <style name="HkSpinner" parent="Widget.AppCompat.Spinner">
+        <item name="android:background">@drawable/bg_spinner</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">44dp</item>
     </style>
 </resources>
