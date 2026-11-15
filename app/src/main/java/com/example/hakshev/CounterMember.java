@@ -1,5 +1,6 @@
 package com.example.hakshev;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Ignore;
@@ -19,11 +20,18 @@ public class CounterMember {
     public long counterId;
     public long soldierId;
 
+    // ---- sync ----
+    @ColumnInfo(defaultValue = "0")
+    public long updatedAt;
+    @ColumnInfo(defaultValue = "0")
+    public long syncedAt;
+
     public CounterMember() {}
 
     @Ignore
     public CounterMember(long counterId, long soldierId) {
         this.counterId = counterId;
         this.soldierId = soldierId;
+        this.updatedAt = System.currentTimeMillis();
     }
 }

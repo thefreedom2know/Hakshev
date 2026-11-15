@@ -17,8 +17,8 @@ import java.util.concurrent.Executors;
 @Database(
         entities = {
                 Soldier.class, CounterDef.class, CounterMember.class, CounterEntry.class,
-                Duty.class, ChecklistTemplate.class, InspectionRun.class},
-        version = 3,
+                Duty.class, ChecklistTemplate.class, InspectionRun.class, Tombstone.class},
+        version = 4,
         exportSchema = false)
 public abstract class Db extends RoomDatabase {
     public abstract AppDao dao();
@@ -36,6 +36,33 @@ public abstract class Db extends RoomDatabase {
         }
     };
 
+    /** Adds the fields used to sync between commanders. Existing data is kept and gets ids. */
+    private static final Migration MIGRATION_3_4 = new Migration(3, 4) {
+        @Override
+        public void migrate(SupportSQLiteDatabase db) {
+            String now = "CAST(strftime('%s','now') AS INTEGER) * 1000";
+            String[] withUid = {"soldiers", "counters", "counter_entries", "duties"};
+            for (String t : withUid) {
+                db.execSQL("ALTER TABLE " + t + " ADD COLUMN uid TEXT");
+                db.execSQL("UPDATE " + t + " SET uid = lower(hex(randomblob(16)))");
+                db.execSQL("ALTER TABLE " + t + " ADD COLUMN syncedAt INTEGER NOT NULL DEFAULT 0");
+            }
+            db.execSQL("ALTER TABLE counters ADD COLUMN updatedAt INTEGER NOT NULL DEFAULT 0");
+            db.execSQL("ALTER TABLE counter_entries ADD COLUMN updatedAt INTEGER NOT NULL DEFAULT 0");
+            db.execSQL("ALTER TABLE duties ADD COLUMN updatedAt INTEGER NOT NULL DEFAULT 0");
+            db.execSQL("ALTER TABLE counter_members ADD COLUMN updatedAt INTEGER NOT NULL DEFAULT 0");
+            db.execSQL("ALTER TABLE counter_members ADD COLUMN syncedAt INTEGER NOT NULL DEFAULT 0");
+            // Mark everything as changed so the first sync uploads it.
+            db.execSQL("UPDATE soldiers SET updatedAt = " + now + " WHERE updatedAt = 0");
+            db.execSQL("UPDATE counters SET updatedAt = " + now);
+            db.execSQL("UPDATE counter_entries SET updatedAt = createdAt");
+            db.execSQL("UPDATE duties SET updatedAt = " + now);
+            db.execSQL("UPDATE counter_members SET updatedAt = " + now);
+            db.execSQL("CREATE TABLE IF NOT EXISTS tombstones (`key` TEXT NOT NULL, `type` TEXT NOT NULL, "
+                    + "`uid` TEXT NOT NULL, `deletedAt` INTEGER NOT NULL, PRIMARY KEY(`key`))");
+        }
+    };
+
     public static Db get(Context c) {
         if (instance == null) {
             synchronized (Db.class) {
@@ -49,7 +76,7 @@ public abstract class Db extends RoomDatabase {
                             // Version 1 was a development build that never shipped.
                             // From version 2 on, real migrations must be written.
                             .fallbackToDestructiveMigrationFrom(true, 1)
-                            .addMigrations(MIGRATION_2_3)
+                            .addMigrations(MIGRATION_2_3, MIGRATION_3_4)
                             .build();
                 }
             }
@@ -82,5 +109,6 @@ public abstract class Db extends RoomDatabase {
     /** Deletes everything stored locally. Call on {@link #IO}. */
     public static void wipeAll(Context c) {
         get(c).clearAllTables();
+        SyncManager.leave(c);
     }
 }

@@ -250,7 +250,7 @@ public class SoldierActivity extends BaseActivity {
         List<CounterMember> one = new ArrayList<>();
         one.add(new CounterMember(counterId, soldierId));
         Db.IO.execute(() -> {
-            Db.dao(this).addMembers(one);
+            Track.addMembers(Db.dao(this), one);
             loadCounters();
         });
     }
@@ -292,6 +292,7 @@ public class SoldierActivity extends BaseActivity {
         new MaterialAlertDialogBuilder(this)
                 .setMessage(getString(R.string.confirm_delete_soldier, soldier.fullName))
                 .setPositiveButton(R.string.yes, (d, w) -> Db.IO.execute(() -> {
+                    Track.soldierDeleted(Db.dao(this), soldier);
                     Db.dao(this).deleteSoldier(soldier);
                     runOnUiThread(this::finish);
                 }))

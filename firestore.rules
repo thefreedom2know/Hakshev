@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Records live under units/{unitId}/records. The unit id is a random 128-bit value that is
+    // only known to commanders who hold the join code, and the content is encrypted client-side.
+    match /units/{unitId}/records/{recordId} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

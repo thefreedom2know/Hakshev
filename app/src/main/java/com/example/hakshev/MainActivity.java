@@ -45,6 +45,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        SyncManager.syncIfDue(this);
         refresh();
     }
 

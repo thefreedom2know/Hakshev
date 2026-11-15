@@ -186,7 +186,7 @@ public class CounterActivity extends BaseActivity {
         List<CounterMember> list = new ArrayList<>();
         for (Soldier s : chosen) list.add(new CounterMember(counterId, s.id));
         Db.IO.execute(() -> {
-            Db.dao(this).addMembers(list);
+            Track.addMembers(Db.dao(this), list);
             reload();
         });
     }

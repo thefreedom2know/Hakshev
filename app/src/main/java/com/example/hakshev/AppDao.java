@@ -88,6 +88,67 @@ public interface AppDao {
             + "ORDER BY createdAt DESC LIMIT 100")
     List<CounterEntry> entries(long counterId, long soldierId);
 
+    // ---- sync: lookups, dirty records, tombstones ----
+    @Query("SELECT * FROM soldiers WHERE uid = :uid LIMIT 1")
+    Soldier soldierByUid(String uid);
+
+    @Query("SELECT * FROM counters WHERE uid = :uid LIMIT 1")
+    CounterDef counterByUid(String uid);
+
+    @Query("SELECT * FROM counter_entries WHERE uid = :uid LIMIT 1")
+    CounterEntry entryByUid(String uid);
+
+    @Query("SELECT * FROM duties WHERE uid = :uid LIMIT 1")
+    Duty dutyByUid(String uid);
+
+    @Query("SELECT * FROM counter_members WHERE counterId = :counterId AND soldierId = :soldierId LIMIT 1")
+    CounterMember member(long counterId, long soldierId);
+
+    @Query("SELECT * FROM soldiers WHERE updatedAt > syncedAt")
+    List<Soldier> soldiersToPush();
+
+    @Query("SELECT * FROM counters WHERE updatedAt > syncedAt")
+    List<CounterDef> countersToPush();
+
+    @Query("SELECT * FROM counter_members WHERE updatedAt > syncedAt")
+    List<CounterMember> membersToPush();
+
+    @Query("SELECT * FROM counter_entries WHERE updatedAt > syncedAt")
+    List<CounterEntry> entriesToPush();
+
+    @Query("SELECT * FROM duties WHERE updatedAt > syncedAt")
+    List<Duty> dutiesToPush();
+
+    @Query("UPDATE soldiers SET syncedAt = :at WHERE id = :id")
+    void markSoldierSynced(long id, long at);
+
+    @Query("UPDATE counters SET syncedAt = :at WHERE id = :id")
+    void markCounterSynced(long id, long at);
+
+    @Query("UPDATE counter_members SET syncedAt = :at WHERE counterId = :counterId AND soldierId = :soldierId")
+    void markMemberSynced(long counterId, long soldierId, long at);
+
+    @Query("UPDATE counter_entries SET syncedAt = :at WHERE id = :id")
+    void markEntrySynced(long id, long at);
+
+    @Query("UPDATE duties SET syncedAt = :at WHERE id = :id")
+    void markDutySynced(long id, long at);
+
+    @Query("UPDATE counters SET convertToId = :toId WHERE id = :id")
+    void setConvertTarget(long id, long toId);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertTombstone(Tombstone t);
+
+    @Query("SELECT * FROM tombstones")
+    List<Tombstone> tombstones();
+
+    @Query("DELETE FROM tombstones WHERE key = :key")
+    void deleteTombstone(String key);
+
+    @Query("DELETE FROM tombstones")
+    void clearTombstones();
+
     // ---- duties ----
     @Insert
     void insertDuty(Duty d);

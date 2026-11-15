@@ -53,6 +53,53 @@
             style="@style/HkTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="@string/section_sync" />
+
+        <TextView
+            android:id="@+id/tvSyncState"
+            style="@style/HkBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSyncCreate"
+            style="@style/HkButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sync_create" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSyncJoin"
+            style="@style/HkButtonOutlined"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sync_join" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSyncNow"
+            style="@style/HkButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sync_now" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSyncCode"
+            style="@style/HkButtonOutlined"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sync_show_code" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSyncLeave"
+            style="@style/HkButtonOutlined"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sync_leave" />
+
+        <TextView
+            style="@style/HkTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="@string/section_display" />
 
         <RadioGroup

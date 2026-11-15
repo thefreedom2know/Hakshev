@@ -113,6 +113,7 @@ public class DutiesActivity extends BaseActivity {
         new MaterialAlertDialogBuilder(this)
                 .setMessage(R.string.confirm_delete_duty)
                 .setPositiveButton(R.string.yes, (dlg, w) -> Db.IO.execute(() -> {
+                    Track.dutyDeleted(Db.dao(this), d);
                     Db.dao(this).deleteDuty(d);
                     reload();
                 }))
@@ -166,6 +167,7 @@ public class DutiesActivity extends BaseActivity {
                     duty.name = dutyNames[spDuty.getSelectedItemPosition()];
                     duty.startTime = start.getTimeInMillis();
                     duty.endTime = duty.startTime + hours * 3600_000L;
+                    duty.updatedAt = System.currentTimeMillis();
                     checkAndInsert(duty, s);
                 })
                 .setNegativeButton(R.string.cancel, null)
