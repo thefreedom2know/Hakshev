@@ -112,6 +112,7 @@ public final class Counters {
     /** IO thread. Returns a message when a conversion happened, otherwise null. */
     private static String addEntry(Context c, CounterEntry e) {
         AppDao dao = Db.dao(c);
+        e.updatedAt = System.currentTimeMillis();
         dao.insertEntry(e);
         if (e.delta <= 0) return null;
         CounterDef def = dao.counter(e.counterId);
@@ -130,6 +131,7 @@ public final class Counters {
             out.note = c.getString(R.string.note_converted_to, target.name);
             out.recordedBy = e.recordedBy;
             out.createdAt = e.createdAt;
+            out.updatedAt = System.currentTimeMillis();
             dao.insertEntry(out);
 
             CounterEntry in = new CounterEntry();
@@ -139,6 +141,7 @@ public final class Counters {
             in.note = c.getString(R.string.note_converted_from, def.convertAt, def.name);
             in.recordedBy = e.recordedBy;
             in.createdAt = e.createdAt;
+            in.updatedAt = System.currentTimeMillis();
             dao.insertEntry(in);
 
             total -= def.convertAt;
@@ -147,7 +150,7 @@ public final class Counters {
         if (conversions == 0) return null;
         List<CounterMember> membership = new ArrayList<>();
         membership.add(new CounterMember(target.id, e.soldierId));
-        dao.addMembers(membership);
+        Track.addMembers(dao, membership);
         Soldier s = dao.soldier(e.soldierId);
         return c.getString(R.string.converted_message, s == null ? "" : s.fullName,
                 def.convertAt * conversions, def.name, conversions, target.name);

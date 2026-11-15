@@ -56,6 +56,33 @@ final class DbKey {
         }
     }
 
+    /** Encrypts a small secret with the Keystore key so it can be kept in preferences. */
+    static String seal(byte[] plain) {
+        try {
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.ENCRYPT_MODE, wrapKey());
+            byte[] iv = cipher.getIV();
+            byte[] enc = cipher.doFinal(plain);
+            byte[] blob = new byte[iv.length + enc.length];
+            System.arraycopy(iv, 0, blob, 0, iv.length);
+            System.arraycopy(enc, 0, blob, iv.length, enc.length);
+            return Base64.encodeToString(blob, Base64.NO_WRAP);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    static byte[] open(String sealed) {
+        try {
+            byte[] blob = Base64.decode(sealed, Base64.NO_WRAP);
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.DECRYPT_MODE, wrapKey(), new GCMParameterSpec(128, blob, 0, 12));
+            return cipher.doFinal(blob, 12, blob.length - 12);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     private static SecretKey wrapKey() throws Exception {
         KeyStore ks = KeyStore.getInstance(KEYSTORE);
         ks.load(null);

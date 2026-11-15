@@ -224,4 +224,32 @@
     <string name="enter_pin">הזן קוד PIN</string>
     <string name="unlock">פתח</string>
     <string name="wrong_pin">קוד שגוי</string>
+
+    <!-- sync between commanders -->
+    <string name="section_sync">סנכרון בין מפקדים</string>
+    <string name="sync_off">לא מחובר ליחידה משותפת. הנתונים נשארים רק במכשיר הזה.</string>
+    <string name="sync_on">מחובר ליחידה משותפת. הנתונים מוצפנים לפני שהם יוצאים מהמכשיר.\nסנכרון אחרון: %1$s</string>
+    <string name="sync_never">עדיין לא</string>
+    <string name="sync_create">צור יחידה משותפת</string>
+    <string name="sync_join">הצטרף עם קוד</string>
+    <string name="sync_now">סנכרן עכשיו</string>
+    <string name="sync_show_code">הצג קוד הצטרפות</string>
+    <string name="sync_leave">עזוב את היחידה המשותפת</string>
+    <string name="sync_pick_json_hint">בחר את הקובץ google-services.json של פרויקט ה-Firebase שלכם.</string>
+    <string name="sync_bad_json">הקובץ לא נראה כמו google-services.json.</string>
+    <string name="sync_code_title">קוד הצטרפות</string>
+    <string name="sync_code_hint">שלחו את הקוד רק למפקדים של היחידה. מי שמחזיק בו יכול לקרוא ולשנות את כל הנתונים.</string>
+    <string name="sync_copy">העתק</string>
+    <string name="sync_share">שתף</string>
+    <string name="sync_copied">הקוד הועתק</string>
+    <string name="sync_join_hint">הדבק כאן את קוד ההצטרפות שקיבלת ממפקד אחר.</string>
+    <string name="sync_bad_code">הקוד לא תקין.</string>
+    <string name="sync_confirm_leave">לעזוב את היחידה המשותפת? הנתונים שבמכשיר נשארים, אבל הם יפסיקו להתעדכן.</string>
+    <string name="sync_left">עזבת את היחידה המשותפת</string>
+    <string name="sync_running">סנכרון כבר רץ…</string>
+    <string name="sync_done">הסנכרון הסתיים: נשלחו %1$d, התקבלו %2$d</string>
+    <string name="sync_wrong_code">לא ניתן לפענח את הנתונים – ייתכן שהקוד שגוי.</string>
+    <string name="sync_error">הסנכרון נכשל: %1$s</string>
+    <string name="sync_not_joined">לא מחובר ליחידה משותפת</string>
+    <string name="sync_started">מסנכרן…</string>
 </resources>

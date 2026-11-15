@@ -1,5 +1,9 @@
 package com.example.hakshev;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
@@ -12,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.List;
 
@@ -22,6 +27,11 @@ public class SettingsActivity extends BaseActivity {
 
     private final ActivityResultLauncher<String[]> picker =
             registerForActivityResult(new ActivityResultContracts.OpenDocument(), this::importFrom);
+
+    private final ActivityResultLauncher<String[]> jsonPicker =
+            registerForActivityResult(new ActivityResultContracts.OpenDocument(), this::createUnitFrom);
+
+    private android.widget.TextView tvSyncState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +80,119 @@ public class SettingsActivity extends BaseActivity {
                 .setNegativeButton(R.string.cancel, null)
                 .show());
         updatePinState();
+
+        tvSyncState = findViewById(R.id.tvSyncState);
+        findViewById(R.id.btnSyncCreate).setOnClickListener(v -> {
+            Ui.toast(this, R.string.sync_pick_json_hint);
+            jsonPicker.launch(new String[]{"application/json", "application/octet-stream", "text/plain"});
+        });
+        findViewById(R.id.btnSyncJoin).setOnClickListener(v -> joinDialog());
+        findViewById(R.id.btnSyncNow).setOnClickListener(v -> syncNow());
+        findViewById(R.id.btnSyncCode).setOnClickListener(v -> showCode());
+        findViewById(R.id.btnSyncLeave).setOnClickListener(v -> new MaterialAlertDialogBuilder(this)
+                .setMessage(R.string.sync_confirm_leave)
+                .setPositiveButton(R.string.yes, (d, w) -> {
+                    SyncManager.leave(this);
+                    Ui.toast(this, R.string.sync_left);
+                    updateSyncState();
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show());
+        updateSyncState();
+    }
+
+    private void updateSyncState() {
+        boolean joined = SyncManager.isJoined(this);
+        long last = SyncConfig.lastSyncAt(this);
+        tvSyncState.setText(joined
+                ? getString(R.string.sync_on, last == 0 ? getString(R.string.sync_never) : Ui.dateTime(last))
+                : getString(R.string.sync_off));
+        int on = joined ? android.view.View.VISIBLE : android.view.View.GONE;
+        int off = joined ? android.view.View.GONE : android.view.View.VISIBLE;
+        findViewById(R.id.btnSyncCreate).setVisibility(off);
+        findViewById(R.id.btnSyncJoin).setVisibility(off);
+        findViewById(R.id.btnSyncNow).setVisibility(on);
+        findViewById(R.id.btnSyncCode).setVisibility(on);
+        findViewById(R.id.btnSyncLeave).setVisibility(on);
+    }
+
+    private void createUnitFrom(Uri uri) {
+        if (uri == null) return;
+        try (InputStream in = getContentResolver().openInputStream(uri)) {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            byte[] buf = new byte[4096];
+            int n;
+            while ((n = in.read(buf)) > 0) bos.write(buf, 0, n);
+            SyncConfig cfg = SyncConfig.fromGoogleServices(bos.toString("UTF-8"));
+            cfg.createUnit();
+            cfg.save(this);
+            updateSyncState();
+            syncNow();
+            showCode();
+        } catch (Exception e) {
+            Ui.toast(this, R.string.sync_bad_json);
+        }
+    }
+
+    private void joinDialog() {
+        EditText et = new EditText(this);
+        et.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        et.setMinLines(3);
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.sync_join)
+                .setMessage(R.string.sync_join_hint)
+                .setView(et)
+                .setPositiveButton(R.string.save, (d, w) -> {
+                    try {
+                        SyncConfig cfg = SyncConfig.fromJoinCode(et.getText().toString());
+                        cfg.save(this);
+                        updateSyncState();
+                        syncNow();
+                    } catch (Exception e) {
+                        Ui.toast(this, R.string.sync_bad_code);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private void showCode() {
+        final String code;
+        try {
+            code = SyncConfig.load(this).joinCode();
+        } catch (Exception e) {
+            return;
+        }
+        EditText et = new EditText(this);
+        et.setText(code);
+        et.setTextIsSelectable(true);
+        et.setKeyListener(null);
+        et.setTextSize(12);
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.sync_code_title)
+                .setMessage(R.string.sync_code_hint)
+                .setView(et)
+                .setPositiveButton(R.string.sync_copy, (d, w) -> {
+                    ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    cm.setPrimaryClip(ClipData.newPlainText("hakshev", code));
+                    Ui.toast(this, R.string.sync_copied);
+                })
+                .setNeutralButton(R.string.sync_share, (d, w) -> {
+                    Intent send = new Intent(Intent.ACTION_SEND);
+                    send.setType("text/plain");
+                    send.putExtra(Intent.EXTRA_TEXT, code);
+                    startActivity(Intent.createChooser(send, getString(R.string.sync_code_title)));
+                })
+                .setNegativeButton(R.string.close, null)
+                .show();
+    }
+
+    private void syncNow() {
+        Ui.toast(this, R.string.sync_started);
+        SyncManager.sync(this, (ok, message) -> {
+            Ui.toast(this, message);
+            updateSyncState();
+        });
     }
 
     private void updatePinState() {

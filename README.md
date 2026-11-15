@@ -43,8 +43,31 @@ Each +1 / -1 (or custom amount with a note) is stored with the commander's name 
 - Do not enter classified information (exact locations, training plans, classified equipment numbers).
   Store short descriptions only (e.g. "פטור עמידה"), never diagnoses or ID numbers.
 
+## Sync between commanders (Firebase)
+Optional. Without it the app is fully local. With it, every commander of a unit sees the same
+soldiers, counters, entries and duties; changes made offline are merged when the phone is online.
+
+**One-time setup (by one person):**
+1. Create a Firebase project. Enable **Firestore** and, under Authentication, the **Anonymous** provider.
+2. Add an Android app with package `com.example.hakshev` and download `google-services.json`.
+3. Publish [`firestore.rules`](firestore.rules) in Firestore > Rules.
+4. In the app: Settings > Sync > *Create shared unit* and pick `google-services.json`.
+   The app shows a **join code**. Send it only to the other commanders.
+
+**Other commanders:** Settings > Sync > *Join with code*, paste the code.
+
+How it works:
+- Every record is encrypted on the phone (AES-256-GCM) with a secret that exists only inside the
+  join code, so Google stores unreadable data. Whoever holds the code can read and change the data.
+- Changed records are pushed, then everything new on the server is pulled (on opening the app
+  once a minute, and with *Sync now*).
+- Conflicts: the newest change to a record wins (phone clocks should be correct). Counter entries
+  are append-only, so counts from two commanders simply add up. Deletions are propagated.
+- Two commanders who each created a counter with the same name get two counters; delete one.
+- Not tested against a live Firebase project yet.
+
 ## Not implemented yet
-- Cloud sync and multi-commander roles (squad / sergeant / platoon commander) with merge-based conflict resolution.
+- Multi-commander roles (squad / sergeant / platoon commander): every commander in a unit can currently read and change everything.
 - Biometric unlock.
 - Excel (.xlsx) import: export to CSV UTF-8 first.
 

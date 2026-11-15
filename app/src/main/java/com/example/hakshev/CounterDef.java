@@ -27,4 +27,11 @@ public class CounterDef {
     public int convertAt;
     @ColumnInfo(defaultValue = "0")
     public long convertToId;
+
+    // ---- sync ----
+    public String uid = java.util.UUID.randomUUID().toString();
+    @ColumnInfo(defaultValue = "0")
+    public long updatedAt;
+    @ColumnInfo(defaultValue = "0")
+    public long syncedAt;
 }

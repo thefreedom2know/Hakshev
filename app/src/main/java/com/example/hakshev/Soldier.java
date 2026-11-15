@@ -1,5 +1,6 @@
 package com.example.hakshev;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -32,4 +33,11 @@ public class Soldier {
     public String notes = "";
 
     public long updatedAt;
+
+    // ---- sync ----
+    /** Global id, the same on every commander's device. */
+    public String uid = java.util.UUID.randomUUID().toString();
+    /** Value of updatedAt that was last pushed / received. updatedAt &gt; syncedAt = needs push. */
+    @ColumnInfo(defaultValue = "0")
+    public long syncedAt;
 }

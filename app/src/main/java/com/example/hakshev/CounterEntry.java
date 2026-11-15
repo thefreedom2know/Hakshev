@@ -1,5 +1,6 @@
 package com.example.hakshev;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Index;
@@ -27,4 +28,11 @@ public class CounterEntry {
     public String note = "";
     public String recordedBy = "";
     public long createdAt;
+
+    // ---- sync (entries are append-only, so two commanders' counts simply add up) ----
+    public String uid = java.util.UUID.randomUUID().toString();
+    @ColumnInfo(defaultValue = "0")
+    public long updatedAt;
+    @ColumnInfo(defaultValue = "0")
+    public long syncedAt;
 }

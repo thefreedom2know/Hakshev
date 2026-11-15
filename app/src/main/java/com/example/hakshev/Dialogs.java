@@ -115,18 +115,20 @@ public final class Dialogs {
                                 target.name = convertTo;
                                 target.period = Periods.TOTAL;
                                 target.createdAt = System.currentTimeMillis();
+                                target.updatedAt = target.createdAt;
                                 target.id = dao.insertCounter(target);
                             }
                             def.convertAt = convertAt;
                             def.convertToId = target.id;
                         }
+                        def.updatedAt = System.currentTimeMillis();
                         long id = def.id;
                         if (isNew) id = dao.insertCounter(def);
                         else dao.updateCounter(def);
                         if (isNew && everyone) {
                             List<CounterMember> all = new ArrayList<>();
                             for (Soldier s : dao.allSoldiers()) all.add(new CounterMember(id, s.id));
-                            dao.addMembers(all);
+                            Track.addMembers(dao, all);
                         }
                         final long finalId = id;
                         a.runOnUiThread(() -> onSaved.accept(finalId));
@@ -137,6 +139,7 @@ public final class Dialogs {
             b.setNeutralButton(R.string.delete, (d, w) -> new MaterialAlertDialogBuilder(a)
                     .setMessage(a.getString(R.string.confirm_delete_counter, def.name))
                     .setPositiveButton(R.string.yes, (d2, w2) -> Db.IO.execute(() -> {
+                        Track.counterDeleted(Db.dao(a), def);
                         Db.dao(a).deleteCounter(def);
                         a.runOnUiThread(onDeleted);
                     }))
@@ -203,6 +206,7 @@ public final class Dialogs {
                         .setItems(rows, (d, which) -> new MaterialAlertDialogBuilder(a)
                                 .setMessage(R.string.confirm_delete_entry)
                                 .setPositiveButton(R.string.yes, (d2, w2) -> Db.IO.execute(() -> {
+                                    Track.entryDeleted(Db.dao(a), entries.get(which));
                                     Db.dao(a).deleteEntry(entries.get(which));
                                     a.runOnUiThread(onChanged);
                                 }))
@@ -210,6 +214,7 @@ public final class Dialogs {
                                 .show())
                         .setPositiveButton(R.string.close, null)
                         .setNeutralButton(R.string.remove_from_counter, (d, w) -> Db.IO.execute(() -> {
+                            Track.memberRemoved(Db.dao(a), def.id, s.id);
                             Db.dao(a).removeMember(def.id, s.id);
                             a.runOnUiThread(onChanged);
                         }))
