@@ -95,27 +95,27 @@
             style="@style/HkTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/section_discipline" />
+            android:text="@string/section_counters" />
 
         <TextView
-            android:id="@+id/tvHoursTotal"
+            android:id="@+id/tvNoCounters"
             style="@style/HkBody"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textStyle="bold" />
+            android:text="@string/soldier_no_counters" />
 
-        <LinearLayout
-            android:id="@+id/disciplineList"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/countersList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:nestedScrollingEnabled="false" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAddDiscipline"
+            android:id="@+id/btnAddCounter"
             style="@style/HkButtonOutlined"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/add_discipline" />
+            android:text="@string/add_counter_to_soldier" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSave"

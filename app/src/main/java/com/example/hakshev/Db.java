@@ -14,9 +14,9 @@ import java.util.concurrent.Executors;
 /** Local-only Room database (offline-first). All access runs on {@link #IO}. */
 @Database(
         entities = {
-                Soldier.class, DisciplineEntry.class, Duty.class,
-                ChecklistTemplate.class, InspectionRun.class, HydrationLog.class},
-        version = 1,
+                Soldier.class, CounterDef.class, CounterMember.class, CounterEntry.class,
+                Duty.class, ChecklistTemplate.class, InspectionRun.class},
+        version = 2,
         exportSchema = false)
 public abstract class Db extends RoomDatabase {
     public abstract AppDao dao();
@@ -35,6 +35,9 @@ public abstract class Db extends RoomDatabase {
                     System.loadLibrary("sqlcipher");
                     instance = Room.databaseBuilder(app, Db.class, "hakshev_enc.db")
                             .openHelperFactory(new SupportOpenHelperFactory(DbKey.passphrase(app)))
+                            // Version 1 was a development build that never shipped.
+                            // From version 2 on, real migrations must be written.
+                            .fallbackToDestructiveMigrationFrom(true, 1)
                             .build();
                 }
             }

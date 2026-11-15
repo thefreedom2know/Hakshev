@@ -6,55 +6,27 @@
     android:padding="12dp">
 
     <TextView
+        android:id="@+id/tvTitle"
         style="@style/HkTitle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/nav_hydration" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <TextView
-            style="@style/HkBody"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/daily_target" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnTargetMinus"
-            style="@style/HkStepButton"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:text="−" />
-
-        <TextView
-            android:id="@+id/tvTarget"
-            style="@style/HkBody"
-            android:layout_width="56dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnTargetPlus"
-            style="@style/HkStepButton"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:text="+" />
-    </LinearLayout>
+        android:layout_height="wrap_content" />
 
     <TextView
-        android:id="@+id/tvParades"
+        android:id="@+id/tvRange"
         style="@style/HkBody"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="4dp"
         android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/tvHint"
+        style="@style/HkBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:text="@string/counter_hint"
+        android:textSize="14sp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
@@ -68,21 +40,45 @@
         android:orientation="horizontal">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnParade"
+            android:id="@+id/btnPlusAll"
             style="@style/HkButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
             android:layout_weight="1"
-            android:text="@string/drink_parade" />
+            android:text="@string/plus_all" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnReset"
+            android:id="@+id/btnAddMembers"
+            style="@style/HkButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_weight="1"
+            android:text="@string/add_members" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnReport"
+            style="@style/HkButtonOutlined"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_weight="1"
+            android:text="@string/copy_counter_report" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnEdit"
             style="@style/HkButtonOutlined"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_weight="1"
-            android:text="@string/reset_day" />
+            android:text="@string/edit_counter" />
     </LinearLayout>
 </LinearLayout>

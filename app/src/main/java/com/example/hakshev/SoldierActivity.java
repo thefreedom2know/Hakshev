@@ -9,14 +9,19 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-/** Soldier profile: personal, medical, equipment and discipline history. */
+/** Soldier profile plus the counters this soldier takes part in. */
 public class SoldierActivity extends BaseActivity {
     public static final String EXTRA_ID = "soldier_id";
 
@@ -32,8 +37,9 @@ public class SoldierActivity extends BaseActivity {
     private EditText etAllergies, etExemptions, etMeds, etWeapon, etEquipment, etNotes;
     private Spinner spSquad, spStatus;
     private MaterialButton btnExpiry;
-    private TextView tvBanner, tvHoursTotal, tvTitle;
-    private ViewGroup disciplineList;
+    private TextView tvBanner, tvTitle, tvNoCounters;
+    private CountAdapter countAdapter;
+    private List<CounterDef> myCounters = new ArrayList<>();
     private List<String> squads = new ArrayList<>();
 
     @Override
@@ -44,8 +50,7 @@ public class SoldierActivity extends BaseActivity {
 
         tvTitle = findViewById(R.id.tvTitle);
         tvBanner = findViewById(R.id.tvAlertBanner);
-        tvHoursTotal = findViewById(R.id.tvHoursTotal);
-        disciplineList = findViewById(R.id.disciplineList);
+        tvNoCounters = findViewById(R.id.tvNoCounters);
         spSquad = findViewById(R.id.spSquad);
         spStatus = findViewById(R.id.spStatus);
         btnExpiry = findViewById(R.id.btnExpiry);
@@ -71,6 +76,34 @@ public class SoldierActivity extends BaseActivity {
         squads = new ArrayList<>(Prefs.squads(this));
         Ui.setSpinner(spStatus, this, Status.labels(this));
 
+        countAdapter = new CountAdapter(new CountAdapter.Listener() {
+            @Override
+            public void onDelta(Counters.Row row, int delta) {
+                CounterEntry e = Dialogs.entry(SoldierActivity.this, row.counterId, soldierId, delta);
+                Db.IO.execute(() -> {
+                    Db.dao(SoldierActivity.this).insertEntry(e);
+                    loadCounters();
+                });
+            }
+
+            @Override
+            public void onClick(Counters.Row row) {
+                CounterDef def = counterById(row.counterId);
+                if (def != null) Dialogs.addAmount(SoldierActivity.this, def, soldier,
+                        () -> Db.IO.execute(SoldierActivity.this::loadCounters));
+            }
+
+            @Override
+            public void onLongClick(Counters.Row row) {
+                CounterDef def = counterById(row.counterId);
+                if (def != null) Dialogs.history(SoldierActivity.this, def, soldier,
+                        () -> Db.IO.execute(SoldierActivity.this::loadCounters));
+            }
+        });
+        RecyclerView countersList = findViewById(R.id.countersList);
+        countersList.setLayoutManager(new LinearLayoutManager(this));
+        countersList.setAdapter(countAdapter);
+
         btnExpiry.setOnClickListener(v -> pickExpiry());
         btnExpiry.setOnLongClickListener(v -> {
             expiry = 0;
@@ -79,12 +112,13 @@ public class SoldierActivity extends BaseActivity {
         });
         findViewById(R.id.btnSave).setOnClickListener(v -> save());
         findViewById(R.id.btnDelete).setOnClickListener(v -> confirmDelete());
-        findViewById(R.id.btnAddDiscipline).setOnClickListener(v -> addDiscipline());
+        findViewById(R.id.btnAddCounter).setOnClickListener(v -> addCounter());
 
         if (soldierId == 0) {
             tvTitle.setText(R.string.new_soldier);
             findViewById(R.id.btnDelete).setVisibility(View.GONE);
-            findViewById(R.id.btnAddDiscipline).setVisibility(View.GONE);
+            findViewById(R.id.btnAddCounter).setVisibility(View.GONE);
+            tvNoCounters.setText(R.string.save_first_for_counters);
             Ui.setSpinner(spSquad, this, squads);
             updateExpiryButton();
         } else {
@@ -105,7 +139,12 @@ public class SoldierActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (soldierId != 0) loadDiscipline();
+        if (soldierId != 0) Db.IO.execute(this::loadCounters);
+    }
+
+    private CounterDef counterById(long id) {
+        for (CounterDef c : myCounters) if (c.id == id) return c;
+        return null;
     }
 
     private void populate() {
@@ -161,47 +200,61 @@ public class SoldierActivity extends BaseActivity {
         }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show();
     }
 
-    private void loadDiscipline() {
-        Db.IO.execute(() -> {
-            List<DisciplineEntry> entries = Db.dao(this).disciplineFor(soldierId);
-            runOnUiThread(() -> renderDiscipline(entries));
+    // ---------------------------------------------------------------- counters
+
+    /** IO thread. */
+    private void loadCounters() {
+        List<CounterDef> mine = Db.dao(this).countersOf(soldierId);
+        List<Counters.Row> rows = Counters.soldierRows(this, soldier, mine, System.currentTimeMillis());
+        runOnUiThread(() -> {
+            myCounters = mine;
+            countAdapter.setItems(rows);
+            tvNoCounters.setVisibility(rows.isEmpty() ? View.VISIBLE : View.GONE);
+            tvNoCounters.setText(R.string.soldier_no_counters);
         });
     }
 
-    private void renderDiscipline(List<DisciplineEntry> entries) {
-        disciplineList.removeAllViews();
-        int hours = 0;
-        for (DisciplineEntry e : entries) {
-            hours += e.hours;
-            StringBuilder sb = new StringBuilder(Status.typeLabel(this, e.type));
-            if (e.hours > 0) sb.append(" (").append(e.hours).append(" ").append(getString(R.string.hours_short)).append(")");
-            if (!e.reason.isEmpty()) sb.append(": ").append(e.reason);
-            sb.append("\n").append(e.recordedBy).append(" · ").append(Ui.dateTime(e.createdAt));
+    /** Adds this soldier to existing counters, or creates a new counter for him. */
+    private void addCounter() {
+        Db.IO.execute(() -> {
+            List<CounterDef> all = Db.dao(this).counters();
+            Set<Long> mine = new HashSet<>();
+            for (CounterDef c : myCounters) mine.add(c.id);
+            List<CounterDef> available = new ArrayList<>();
+            for (CounterDef c : all) if (!mine.contains(c.id)) available.add(c);
+            runOnUiThread(() -> showCounterChoice(available));
+        });
+    }
 
-            TextView tv = new TextView(this);
-            tv.setText(sb);
-            tv.setTextSize(16);
-            tv.setMinHeight((int) (56 * getResources().getDisplayMetrics().density));
-            tv.setPadding(8, 12, 8, 12);
-            tv.setTextColor(tvHoursTotal.getTextColors());
-            tv.setOnClickListener(v -> new MaterialAlertDialogBuilder(this)
-                    .setMessage(R.string.confirm_delete_entry)
-                    .setPositiveButton(R.string.yes, (d, w) -> Db.IO.execute(() -> {
-                        Db.dao(this).deleteDiscipline(e);
-                        loadDiscipline();
-                    }))
-                    .setNegativeButton(R.string.cancel, null)
-                    .show());
-            disciplineList.addView(tv);
+    private void showCounterChoice(List<CounterDef> available) {
+        String[] labels = new String[available.size() + 1];
+        for (int i = 0; i < available.size(); i++) {
+            CounterDef c = available.get(i);
+            labels[i] = c.name + " (" + Periods.label(this, c.period) + ")";
         }
-        tvHoursTotal.setText(getString(R.string.hours_total, hours));
+        labels[available.size()] = getString(R.string.new_counter);
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.add_counter_to_soldier)
+                .setItems(labels, (d, which) -> {
+                    if (which < available.size()) {
+                        join(available.get(which).id);
+                    } else {
+                        Dialogs.newCounter(this, this::join);
+                    }
+                })
+                .show();
     }
 
-    private void addDiscipline() {
-        List<Soldier> one = new ArrayList<>();
-        one.add(soldier);
-        Dialogs.addDiscipline(this, one, soldierId, this::loadDiscipline);
+    private void join(long counterId) {
+        List<CounterMember> one = new ArrayList<>();
+        one.add(new CounterMember(counterId, soldierId));
+        Db.IO.execute(() -> {
+            Db.dao(this).addMembers(one);
+            loadCounters();
+        });
     }
+
+    // -------------------------------------------------------------------- save
 
     private void save() {
         String name = etName.getText().toString().trim();

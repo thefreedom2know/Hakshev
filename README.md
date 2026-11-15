@@ -10,13 +10,24 @@ Digital field notebook for squad / platoon commanders. Android app (Java + XML l
 ## Screens
 | Screen | What it does |
 |---|---|
-| Dashboard | Headcount, average water, exceptions list, quick actions, WhatsApp report |
-| Roster | Filter by squad / status, +/- water and status per soldier, bulk actions |
-| Soldier profile | Personal, medical and exemptions (with expiry), equipment, discipline history |
-| Hydration | Daily target, per-soldier progress, drink-parade log, automatic midnight reset |
-| Discipline & duties | Accumulated exit hours, guard shifts with a 6h rest warning and fairness count |
+| Dashboard | Headcount, counters overview, exceptions, quick actions, WhatsApp report |
+| Counters | The commander defines what to count; one screen per counter with its soldiers |
+| Roster | Filter by squad / status, status per soldier, bulk presence |
+| Soldier profile | Personal, medical and exemptions (with expiry), equipment, and the soldier's counters |
+| Duties | Guard shifts with a 6h rest warning and fairness count |
 | Inspections | Checklist templates, exception-based inspection, history |
 | Settings | Squads, CSV import, day / tactical-night theme, PIN lock, auto-wipe |
+
+## Counters
+Nothing is counted by default. The commander creates counters (with suggestions such as water,
+exit hours, passed tests) and chooses for each one:
+- **Period:** day, week (from Sunday), two weeks, month, or cumulative (never resets).
+  Entries are kept, so the previous period is shown next to the current one.
+- **Optional target** per soldier and an optional unit label.
+- **Who takes part**, in two ways: open a soldier and add counters to him, or open a counter and add
+  soldiers (everyone, a whole squad, or a manual pick).
+
+Each +1 / -1 (or custom amount with a note) is stored with the commander's name and time.
 
 ## Field design
 - Day theme is high contrast; night theme is pure black with dim red text.

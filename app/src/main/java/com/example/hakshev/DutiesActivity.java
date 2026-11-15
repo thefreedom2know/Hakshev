@@ -1,7 +1,6 @@
 package com.example.hakshev;
 
 import android.app.TimePickerDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
@@ -14,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
@@ -23,56 +21,36 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Discipline (exit hours, punishments) and guard / chore assignments. */
-public class DisciplineActivity extends BaseActivity {
+/** Guard shifts and chores, with a rest-time warning and a fairness count. */
+public class DutiesActivity extends BaseActivity {
     /** Required contiguous rest between two shifts of the same soldier (sleep rule). */
     private static final long REST_MS = 6L * 3600 * 1000;
 
-    private boolean dutiesTab = false;
     private TextAdapter adapter;
-    private MaterialButton btnAdd;
-
     private List<Soldier> soldiers = new ArrayList<>();
     private List<Duty> duties = new ArrayList<>();
-    private final List<Long> rowSoldierIds = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_discipline);
-        btnAdd = findViewById(R.id.btnAdd);
+        setContentView(R.layout.activity_duties);
 
         adapter = new TextAdapter();
         adapter.setListener(new TextAdapter.Listener() {
             @Override
             public void onClick(int position) {
-                if (!dutiesTab && position >= 0 && position < rowSoldierIds.size()) {
-                    startActivity(new Intent(DisciplineActivity.this, SoldierActivity.class)
-                            .putExtra(SoldierActivity.EXTRA_ID, rowSoldierIds.get(position)));
-                }
             }
 
             @Override
             public void onLongClick(int position) {
-                if (dutiesTab) confirmDeleteDuty(position);
+                confirmDeleteDuty(position);
             }
         });
         RecyclerView list = findViewById(R.id.list);
         list.setLayoutManager(new LinearLayoutManager(this));
         list.setAdapter(adapter);
 
-        MaterialButtonToggleGroup toggle = findViewById(R.id.toggle);
-        toggle.check(R.id.tabHours);
-        toggle.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
-            if (!isChecked) return;
-            dutiesTab = checkedId == R.id.tabDuties;
-            Db.IO.execute(this::reload);
-        });
-
-        btnAdd.setOnClickListener(v -> {
-            if (dutiesTab) addDuty();
-            else Dialogs.addDiscipline(this, soldiers, 0, () -> Db.IO.execute(this::reload));
-        });
+        findViewById(R.id.btnAdd).setOnClickListener(v -> addDuty());
     }
 
     @Override
@@ -85,15 +63,13 @@ public class DisciplineActivity extends BaseActivity {
     private void reload() {
         AppDao dao = Db.dao(this);
         List<Soldier> sl = dao.allSoldiers();
-        List<DisciplineEntry> entries = dao.allDiscipline();
         long now = System.currentTimeMillis();
         List<Duty> ds = dao.dutiesSince(now - 12L * 3600 * 1000);
         List<Duty> week = dao.dutiesStartedSince(now - 7L * 86_400_000L);
         runOnUiThread(() -> {
             soldiers = sl;
             duties = ds;
-            if (dutiesTab) renderDuties(week);
-            else renderHours(entries);
+            render(week);
         });
     }
 
@@ -102,50 +78,7 @@ public class DisciplineActivity extends BaseActivity {
         return null;
     }
 
-    private void renderHours(List<DisciplineEntry> entries) {
-        btnAdd.setText(R.string.add_discipline);
-        Map<Long, List<DisciplineEntry>> bySoldier = new HashMap<>();
-        for (DisciplineEntry e : entries) {
-            List<DisciplineEntry> l = bySoldier.get(e.soldierId);
-            if (l == null) {
-                l = new ArrayList<>();
-                bySoldier.put(e.soldierId, l);
-            }
-            l.add(e);
-        }
-        // Soldiers with the most accumulated exit hours first.
-        List<Soldier> withEntries = new ArrayList<>();
-        for (Soldier s : soldiers) if (bySoldier.containsKey(s.id)) withEntries.add(s);
-        withEntries.sort((a, b) -> hoursOf(bySoldier.get(b.id)) - hoursOf(bySoldier.get(a.id)));
-
-        List<String> rows = new ArrayList<>();
-        rowSoldierIds.clear();
-        for (Soldier s : withEntries) {
-            List<DisciplineEntry> l = bySoldier.get(s.id);
-            StringBuilder sb = new StringBuilder();
-            sb.append(s.fullName).append(" — ")
-                    .append(getString(R.string.hours_total, hoursOf(l))).append("\n");
-            for (DisciplineEntry e : l) {
-                sb.append("• ").append(Status.typeLabel(this, e.type));
-                if (e.hours > 0) sb.append(" ").append(e.hours).append(getString(R.string.hours_short));
-                if (!e.reason.isEmpty()) sb.append(": ").append(e.reason);
-                sb.append(" (").append(e.recordedBy).append(", ").append(Ui.dateTime(e.createdAt)).append(")\n");
-            }
-            rows.add(sb.toString().trim());
-            rowSoldierIds.add(s.id);
-        }
-        if (rows.isEmpty()) rows.add(getString(R.string.no_discipline));
-        adapter.setItems(rows);
-    }
-
-    private int hoursOf(List<DisciplineEntry> l) {
-        int h = 0;
-        for (DisciplineEntry e : l) h += e.hours;
-        return h;
-    }
-
-    private void renderDuties(List<Duty> week) {
-        btnAdd.setText(R.string.add_duty);
+    private void render(List<Duty> week) {
         List<String> rows = new ArrayList<>();
 
         // Fairness: number of shifts per soldier in the last 7 days.

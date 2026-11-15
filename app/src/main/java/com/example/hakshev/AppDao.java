@@ -3,6 +3,7 @@ package com.example.hakshev;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -29,33 +30,60 @@ public interface AppDao {
     @Query("SELECT * FROM soldiers WHERE id = :id")
     Soldier soldier(long id);
 
-    @Query("UPDATE soldiers SET waterCount = MAX(0, waterCount + :delta), updatedAt = :now WHERE id = :id")
-    void addWater(long id, int delta, long now);
-
-    @Query("UPDATE soldiers SET waterCount = waterCount + :delta, updatedAt = :now WHERE id IN (:ids)")
-    void addWaterBulk(List<Long> ids, int delta, long now);
-
     @Query("UPDATE soldiers SET status = :status, updatedAt = :now WHERE id IN (:ids)")
     void setStatusBulk(List<Long> ids, String status, long now);
 
-    @Query("UPDATE soldiers SET waterCount = 0")
-    void resetWater();
-
-    // ---- discipline ----
+    // ---- counters ----
     @Insert
-    void insertDiscipline(DisciplineEntry e);
+    long insertCounter(CounterDef c);
+
+    @Update
+    void updateCounter(CounterDef c);
 
     @Delete
-    void deleteDiscipline(DisciplineEntry e);
+    void deleteCounter(CounterDef c);
 
-    @Query("SELECT * FROM discipline WHERE soldierId = :soldierId ORDER BY createdAt DESC")
-    List<DisciplineEntry> disciplineFor(long soldierId);
+    @Query("SELECT * FROM counters ORDER BY name")
+    List<CounterDef> counters();
 
-    @Query("SELECT * FROM discipline ORDER BY createdAt DESC")
-    List<DisciplineEntry> allDiscipline();
+    @Query("SELECT * FROM counters WHERE id = :id")
+    CounterDef counter(long id);
 
-    @Query("SELECT soldierId, SUM(hours) AS total FROM discipline WHERE type = 'EXIT_HOURS' GROUP BY soldierId")
-    List<HoursSum> exitHoursSums();
+    @Query("SELECT s.* FROM soldiers s INNER JOIN counter_members m ON m.soldierId = s.id "
+            + "WHERE m.counterId = :counterId ORDER BY s.squad, s.fullName")
+    List<Soldier> members(long counterId);
+
+    @Query("SELECT c.* FROM counters c INNER JOIN counter_members m ON m.counterId = c.id "
+            + "WHERE m.soldierId = :soldierId ORDER BY c.name")
+    List<CounterDef> countersOf(long soldierId);
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void addMembers(List<CounterMember> list);
+
+    @Query("DELETE FROM counter_members WHERE counterId = :counterId AND soldierId = :soldierId")
+    void removeMember(long counterId, long soldierId);
+
+    // ---- counter entries ----
+    @Insert
+    void insertEntry(CounterEntry e);
+
+    @Insert
+    void insertEntries(List<CounterEntry> list);
+
+    @Delete
+    void deleteEntry(CounterEntry e);
+
+    @Query("SELECT soldierId, SUM(delta) AS total FROM counter_entries "
+            + "WHERE counterId = :counterId AND createdAt >= :from AND createdAt < :to GROUP BY soldierId")
+    List<SoldierTotal> totals(long counterId, long from, long to);
+
+    @Query("SELECT COALESCE(SUM(delta), 0) FROM counter_entries "
+            + "WHERE counterId = :counterId AND soldierId = :soldierId AND createdAt >= :from AND createdAt < :to")
+    int total(long counterId, long soldierId, long from, long to);
+
+    @Query("SELECT * FROM counter_entries WHERE counterId = :counterId AND soldierId = :soldierId "
+            + "ORDER BY createdAt DESC LIMIT 100")
+    List<CounterEntry> entries(long counterId, long soldierId);
 
     // ---- duties ----
     @Insert
@@ -94,11 +122,4 @@ public interface AppDao {
 
     @Query("SELECT * FROM inspection_runs ORDER BY runAt DESC LIMIT 30")
     List<InspectionRun> recentRuns();
-
-    // ---- hydration log ----
-    @Insert
-    void insertHydrationLog(HydrationLog l);
-
-    @Query("SELECT * FROM hydration_logs WHERE at >= :since ORDER BY at")
-    List<HydrationLog> hydrationLogsSince(long since);
 }

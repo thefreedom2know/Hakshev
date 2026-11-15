@@ -46,23 +46,6 @@ public final class Prefs {
         sp(c).edit().putString("squads", commaSeparated).apply();
     }
 
-    // ---- hydration ----
-    public static int waterTarget(Context c) {
-        return sp(c).getInt("water_target", 4);
-    }
-
-    public static void setWaterTarget(Context c, int v) {
-        sp(c).edit().putInt("water_target", Math.max(1, Math.min(20, v))).apply();
-    }
-
-    public static String lastResetDay(Context c) {
-        return sp(c).getString("last_reset_day", "");
-    }
-
-    public static void setLastResetDay(Context c, String v) {
-        sp(c).edit().putString("last_reset_day", v).apply();
-    }
-
     // ---- theme ----
     public static int theme(Context c) {
         return sp(c).getInt("theme", THEME_SYSTEM);

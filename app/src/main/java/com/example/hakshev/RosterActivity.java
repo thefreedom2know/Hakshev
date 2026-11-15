@@ -41,14 +41,6 @@ public class RosterActivity extends BaseActivity {
             }
 
             @Override
-            public void onWater(Soldier s, int delta) {
-                Db.IO.execute(() -> {
-                    Db.dao(RosterActivity.this).addWater(s.id, delta, System.currentTimeMillis());
-                    reload();
-                });
-            }
-
-            @Override
             public void onStatus(Soldier s) {
                 new MaterialAlertDialogBuilder(RosterActivity.this)
                         .setTitle(s.fullName)
@@ -86,8 +78,7 @@ public class RosterActivity extends BaseActivity {
         spSquad.setOnItemSelectedListener(onFilter);
         spStatus.setOnItemSelectedListener(onFilter);
 
-        findViewById(R.id.btnBulkWater).setOnClickListener(v -> confirmBulk(true));
-        findViewById(R.id.btnBulkPresent).setOnClickListener(v -> confirmBulk(false));
+        findViewById(R.id.btnBulkPresent).setOnClickListener(v -> confirmBulkPresent());
         findViewById(R.id.btnAdd).setOnClickListener(v ->
                 startActivity(new Intent(this, SoldierActivity.class)));
     }
@@ -138,7 +129,7 @@ public class RosterActivity extends BaseActivity {
         tvCount.setText(getString(R.string.roster_count, filtered.size(), all.size()));
     }
 
-    private void confirmBulk(boolean water) {
+    private void confirmBulkPresent() {
         if (filtered.isEmpty()) {
             Ui.toast(this, R.string.no_soldiers);
             return;
@@ -146,11 +137,9 @@ public class RosterActivity extends BaseActivity {
         final List<Long> ids = new ArrayList<>();
         for (Soldier s : filtered) ids.add(s.id);
         new MaterialAlertDialogBuilder(this)
-                .setMessage(getString(water ? R.string.confirm_bulk_water : R.string.confirm_bulk_present, ids.size()))
+                .setMessage(getString(R.string.confirm_bulk_present, ids.size()))
                 .setPositiveButton(R.string.yes, (d, w) -> Db.IO.execute(() -> {
-                    long now = System.currentTimeMillis();
-                    if (water) Db.dao(this).addWaterBulk(ids, 1, now);
-                    else Db.dao(this).setStatusBulk(ids, Status.PRESENT, now);
+                    Db.dao(this).setStatusBulk(ids, Status.PRESENT, System.currentTimeMillis());
                     reload();
                 }))
                 .setNegativeButton(R.string.cancel, null)

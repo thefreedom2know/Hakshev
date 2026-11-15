@@ -16,7 +16,6 @@ public class Soldier {
     public String squad = "";
     /** One of the Status.* codes. */
     public String status = Status.PRESENT;
-    public int waterCount;
 
     public String shoeSize = "";
     public String uniformSize = "";

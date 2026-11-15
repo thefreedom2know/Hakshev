@@ -13,11 +13,10 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
-/** Dashboard: headcount, water average, exceptions list and quick actions. */
+/** Dashboard: headcount, counters overview, exceptions and quick actions. */
 public class MainActivity extends BaseActivity {
-    private TextView tvDate, tvHeadcount, tvAvgWater, tvAlertCount, tvAlerts;
+    private TextView tvDate, tvHeadcount, tvCounterCount, tvAlertCount, tvAlerts, tvCounters;
     private List<Soldier> soldiers = new ArrayList<>();
 
     @Override
@@ -26,18 +25,18 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         tvDate = findViewById(R.id.tvDate);
         tvHeadcount = findViewById(R.id.tvHeadcount);
-        tvAvgWater = findViewById(R.id.tvAvgWater);
+        tvCounterCount = findViewById(R.id.tvCounterCount);
         tvAlertCount = findViewById(R.id.tvAlertCount);
         tvAlerts = findViewById(R.id.tvAlerts);
+        tvCounters = findViewById(R.id.tvCounters);
 
-        findViewById(R.id.btnWaterAll).setOnClickListener(v -> confirmWaterAll());
         findViewById(R.id.btnNewInspection).setOnClickListener(v ->
                 startActivity(new Intent(this, InspectionActivity.class)
                         .putExtra(InspectionActivity.EXTRA_AUTOSTART, true)));
         findViewById(R.id.btnReport).setOnClickListener(v -> chooseReport());
+        findViewById(R.id.btnCounters).setOnClickListener(v -> startActivity(new Intent(this, CountersActivity.class)));
         findViewById(R.id.btnRoster).setOnClickListener(v -> startActivity(new Intent(this, RosterActivity.class)));
-        findViewById(R.id.btnHydration).setOnClickListener(v -> startActivity(new Intent(this, HydrationActivity.class)));
-        findViewById(R.id.btnDiscipline).setOnClickListener(v -> startActivity(new Intent(this, DisciplineActivity.class)));
+        findViewById(R.id.btnDuties).setOnClickListener(v -> startActivity(new Intent(this, DutiesActivity.class)));
         findViewById(R.id.btnInspections).setOnClickListener(v -> startActivity(new Intent(this, InspectionActivity.class)));
         findViewById(R.id.btnSettings).setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
     }
@@ -60,23 +59,32 @@ public class MainActivity extends BaseActivity {
             }
             AppDao dao = Db.dao(c);
             Db.ensureSeed(c);
-            // Automatic daily reset of the hydration counters.
-            if (!Ui.today().equals(Prefs.lastResetDay(c))) {
-                dao.resetWater();
-                Prefs.setLastResetDay(c, Ui.today());
-            }
             List<Soldier> list = dao.allSoldiers();
+            long now = System.currentTimeMillis();
+            List<CounterDef> counters = dao.counters();
+            StringBuilder sb = new StringBuilder();
+            for (CounterDef def : counters) {
+                int members = dao.members(def.id).size();
+                int total = Counters.groupTotal(c, def, now);
+                CounterDef unitOnly = new CounterDef();
+                unitOnly.unit = def.unit;
+                sb.append("• ").append(def.name).append(" (").append(Periods.label(c, def.period))
+                        .append("): ").append(Counters.valueText(unitOnly, total))
+                        .append(" · ").append(c.getString(R.string.n_soldiers, members)).append("\n");
+            }
+            String counterText = sb.length() == 0 ? c.getString(R.string.counters_empty) : sb.toString().trim();
             runOnUiThread(() -> {
                 soldiers = list;
-                render();
+                render(counters.size(), counterText);
             });
         });
     }
 
-    private void render() {
+    private void render(int counterCount, String counterText) {
         tvDate.setText(DateFormat.getDateInstance(DateFormat.FULL).format(new Date()));
         tvHeadcount.setText(Alerts.headcount(soldiers) + "/" + soldiers.size());
-        tvAvgWater.setText(String.format(Locale.getDefault(), "%.1f", Alerts.averageWater(soldiers)));
+        tvCounterCount.setText(String.valueOf(counterCount));
+        tvCounters.setText(counterText);
         List<String> alerts = Alerts.compute(this, soldiers);
         tvAlertCount.setText(String.valueOf(alerts.size()));
         if (alerts.isEmpty()) {
@@ -88,34 +96,23 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private void confirmWaterAll() {
-        new MaterialAlertDialogBuilder(this)
-                .setMessage(R.string.confirm_water_all)
-                .setPositiveButton(R.string.yes, (d, w) -> {
-                    List<Long> ids = new ArrayList<>();
-                    for (Soldier s : soldiers) if (!Status.LEAVE.equals(s.status)) ids.add(s.id);
-                    Db.IO.execute(() -> {
-                        Db.dao(this).addWaterBulk(ids, 1, System.currentTimeMillis());
-                        runOnUiThread(this::refresh);
-                    });
-                })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
-    }
-
     private void chooseReport() {
         String[] names = {
-                getString(R.string.report_morning), getString(R.string.report_headcount_title),
-                getString(R.string.report_hydration_title)};
+                getString(R.string.report_full), getString(R.string.report_headcount_title),
+                getString(R.string.report_counters_title)};
         new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.copy_report)
-                .setItems(names, (d, which) -> {
+                .setItems(names, (d, which) -> Db.IO.execute(() -> {
+                    Context c = getApplicationContext();
+                    List<Soldier> list = Db.dao(c).allSoldiers();
                     String text;
-                    if (which == 0) text = ReportBuilder.morning(this, soldiers);
-                    else if (which == 1) text = ReportBuilder.headcount(this, soldiers);
-                    else text = ReportBuilder.hydration(this, soldiers);
-                    showReport(text);
-                })
+                    if (which == 0) text = ReportBuilder.full(c, list);
+                    else if (which == 1) text = ReportBuilder.headcount(c, list);
+                    else text = Counters.reportAll(c, System.currentTimeMillis());
+                    if (text.isEmpty()) text = c.getString(R.string.counters_empty);
+                    final String result = text;
+                    runOnUiThread(() -> showReport(result));
+                }))
                 .show();
     }
 

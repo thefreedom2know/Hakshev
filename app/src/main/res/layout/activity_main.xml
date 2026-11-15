@@ -76,7 +76,7 @@
                     android:padding="8dp">
 
                     <TextView
-                        android:id="@+id/tvAvgWater"
+                        android:id="@+id/tvCounterCount"
                         style="@style/HkBody"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -89,7 +89,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="@string/metric_water"
+                        android:text="@string/metric_counters"
                         android:textSize="14sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -132,6 +132,25 @@
             style="@style/HkTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="@string/nav_counters" />
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/HkCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvCounters"
+                style="@style/HkBody"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            style="@style/HkTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="@string/alerts_title"
             android:textColor="@color/hk_alert" />
 
@@ -155,11 +174,11 @@
             android:text="@string/quick_actions" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnWaterAll"
+            android:id="@+id/btnCounters"
             style="@style/HkButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/water_all" />
+            android:text="@string/nav_counters" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnNewInspection"
@@ -189,18 +208,11 @@
             android:text="@string/nav_roster" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnHydration"
+            android:id="@+id/btnDuties"
             style="@style/HkButtonOutlined"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/nav_hydration" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnDiscipline"
-            style="@style/HkButtonOutlined"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/nav_discipline" />
+            android:text="@string/nav_duties" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnInspections"

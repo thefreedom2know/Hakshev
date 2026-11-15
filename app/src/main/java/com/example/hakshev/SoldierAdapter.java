@@ -14,12 +14,10 @@ import com.google.android.material.button.MaterialButton;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Roster rows: quick +/- water and status change without opening the profile. */
+/** Roster rows: tap opens the profile, the status button changes status in one step. */
 public class SoldierAdapter extends RecyclerView.Adapter<SoldierAdapter.VH> {
     public interface Listener {
         void onOpen(Soldier s);
-
-        void onWater(Soldier s, int delta);
 
         void onStatus(Soldier s);
     }
@@ -62,12 +60,8 @@ public class SoldierAdapter extends RecyclerView.Adapter<SoldierAdapter.VH> {
         h.badges.setVisibility(badges.length() == 0 ? View.GONE : View.VISIBLE);
 
         h.status.setText(Status.label(c, s.status));
-        h.water.setText(String.valueOf(s.waterCount));
-
         h.itemView.setOnClickListener(v -> listener.onOpen(s));
         h.status.setOnClickListener(v -> listener.onStatus(s));
-        h.minus.setOnClickListener(v -> listener.onWater(s, -1));
-        h.plus.setOnClickListener(v -> listener.onWater(s, 1));
     }
 
     @Override
@@ -76,18 +70,15 @@ public class SoldierAdapter extends RecyclerView.Adapter<SoldierAdapter.VH> {
     }
 
     static class VH extends RecyclerView.ViewHolder {
-        final TextView name, sub, badges, water;
-        final MaterialButton status, minus, plus;
+        final TextView name, sub, badges;
+        final MaterialButton status;
 
         VH(View v) {
             super(v);
             name = v.findViewById(R.id.tvName);
             sub = v.findViewById(R.id.tvSub);
             badges = v.findViewById(R.id.tvBadges);
-            water = v.findViewById(R.id.tvWater);
             status = v.findViewById(R.id.btnStatus);
-            minus = v.findViewById(R.id.btnMinus);
-            plus = v.findViewById(R.id.btnPlus);
         }
     }
 }

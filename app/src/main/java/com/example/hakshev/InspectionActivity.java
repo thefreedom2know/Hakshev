@@ -208,13 +208,8 @@ public class InspectionActivity extends BaseActivity {
 
     /** Create a new template, or clone {@code base} when it is not null. */
     private void editTemplate(ChecklistTemplate base) {
-        View v = getLayoutInflater().inflate(R.layout.dialog_duty, null);
-        // Reuse the form container only; hide the duty-specific controls.
-        v.findViewById(R.id.spSoldier).setVisibility(View.GONE);
-        v.findViewById(R.id.spDuty).setVisibility(View.GONE);
-        v.findViewById(R.id.btnTime).setVisibility(View.GONE);
-        v.findViewById(R.id.cbTomorrow).setVisibility(View.GONE);
-        ViewGroup form = v.findViewById(R.id.formDuty);
+        View v = getLayoutInflater().inflate(R.layout.dialog_form, null);
+        ViewGroup form = v.findViewById(R.id.form);
         EditText etName = Ui.addField(this, form, R.string.label_template_name,
                 base == null ? "" : base.name + " " + getString(R.string.copy_suffix), InputType.TYPE_CLASS_TEXT);
         EditText etItems = Ui.addField(this, form, R.string.label_template_items,

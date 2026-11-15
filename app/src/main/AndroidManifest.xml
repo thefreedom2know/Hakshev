@@ -23,8 +23,9 @@
         <activity android:name=".LockActivity" android:exported="false" />
         <activity android:name=".RosterActivity" android:exported="false" />
         <activity android:name=".SoldierActivity" android:exported="false" />
-        <activity android:name=".HydrationActivity" android:exported="false" />
-        <activity android:name=".DisciplineActivity" android:exported="false" />
+        <activity android:name=".CountersActivity" android:exported="false" />
+        <activity android:name=".CounterActivity" android:exported="false" />
+        <activity android:name=".DutiesActivity" android:exported="false" />
         <activity android:name=".InspectionActivity" android:exported="false" />
         <activity android:name=".SettingsActivity" android:exported="false" />
     </application>

@@ -53,30 +53,11 @@ public final class ReportBuilder {
         return sb.toString().trim();
     }
 
-    public static String hydration(Context c, List<Soldier> soldiers) {
-        int target = Prefs.waterTarget(c);
-        StringBuilder sb = new StringBuilder();
-        sb.append("*").append(c.getString(R.string.report_hydration_title)).append("*\n");
-        sb.append(stamp()).append("\n\n");
-        sb.append(c.getString(R.string.report_water_avg,
-                String.format(Locale.getDefault(), "%.1f", Alerts.averageWater(soldiers)), target)).append("\n");
-        StringBuilder behind = new StringBuilder();
-        for (Soldier s : soldiers) {
-            if (s.waterCount < target && !Status.LEAVE.equals(s.status)) {
-                behind.append("- ").append(s.fullName).append(": ")
-                        .append(s.waterCount).append("/").append(target).append("\n");
-            }
-        }
-        if (behind.length() > 0) {
-            sb.append("\n*").append(c.getString(R.string.report_below_target)).append("*\n").append(behind);
-        }
-        return sb.toString().trim();
-    }
-
-    public static String morning(Context c, List<Soldier> soldiers) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(headcount(c, soldiers)).append("\n\n");
-        sb.append(hydration(c, soldiers));
+    /** Headcount + every counter + exceptions. Runs on {@link Db#IO}. */
+    public static String full(Context c, List<Soldier> soldiers) {
+        StringBuilder sb = new StringBuilder(headcount(c, soldiers));
+        String counters = Counters.reportAll(c, System.currentTimeMillis());
+        if (!counters.isEmpty()) sb.append("\n\n").append(counters);
         List<String> alerts = Alerts.compute(c, soldiers);
         if (!alerts.isEmpty()) {
             sb.append("\n\n*").append(c.getString(R.string.report_alerts)).append("*\n");
