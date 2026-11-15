@@ -28,5 +28,6 @@ dependencies {
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.room.runtime)
     annotationProcessor(libs.androidx.room.compiler)
+    implementation("net.zetetic:sqlcipher-android:${libs.versions.sqlcipher.get()}@aar")
     testImplementation(libs.junit)
 }

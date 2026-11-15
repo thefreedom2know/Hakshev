@@ -6,6 +6,8 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -27,8 +29,13 @@ public abstract class Db extends RoomDatabase {
         if (instance == null) {
             synchronized (Db.class) {
                 if (instance == null) {
-                    instance = Room.databaseBuilder(
-                            c.getApplicationContext(), Db.class, "hakshev.db").build();
+                    Context app = c.getApplicationContext();
+                    // Remove the pre-encryption database (never shipped to users).
+                    app.deleteDatabase("hakshev.db");
+                    System.loadLibrary("sqlcipher");
+                    instance = Room.databaseBuilder(app, Db.class, "hakshev_enc.db")
+                            .openHelperFactory(new SupportOpenHelperFactory(DbKey.passphrase(app)))
+                            .build();
                 }
             }
         }

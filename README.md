@@ -24,6 +24,8 @@ Digital field notebook for squad / platoon commanders. Android app (Java + XML l
 - No GPS, no background sync, no animations (battery).
 
 ## Security
+- The database is encrypted at rest with SQLCipher (AES-256). The random passphrase is wrapped by an
+  Android Keystore key, so the file is unreadable if copied off the device.
 - Data is stored locally only (Room). Backups are disabled (`allowBackup=false`, no cloud transfer).
 - PIN lock (salted SHA-256), re-lock after 30s in background, `FLAG_SECURE` blocks screenshots and recents preview.
 - Optional auto-wipe after N days of inactivity, and a manual wipe button.
@@ -32,7 +34,6 @@ Digital field notebook for squad / platoon commanders. Android app (Java + XML l
 
 ## Not implemented yet
 - Cloud sync and multi-commander roles (squad / sergeant / platoon commander) with merge-based conflict resolution.
-- Database encryption at rest (e.g. SQLCipher).
 - Biometric unlock.
 - Excel (.xlsx) import: export to CSV UTF-8 first.
 
