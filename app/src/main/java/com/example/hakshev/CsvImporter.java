@@ -21,7 +21,7 @@ public final class CsvImporter {
         String line;
         boolean first = true;
         while ((line = r.readLine()) != null) {
-            if (first && line.startsWith("﻿")) line = line.substring(1);
+            if (first && !line.isEmpty() && line.charAt(0) == (char) 0xFEFF) line = line.substring(1);
             if (line.trim().isEmpty()) {
                 first = false;
                 continue;
