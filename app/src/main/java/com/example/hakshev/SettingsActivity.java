@@ -37,6 +37,7 @@ public class SettingsActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        Nav.attach(this, R.id.nav_settings);
 
         ViewGroup unit = findViewById(R.id.formUnit);
         etCommander = Ui.addField(this, unit, R.string.label_commander, Prefs.commander(this), InputType.TYPE_CLASS_TEXT);

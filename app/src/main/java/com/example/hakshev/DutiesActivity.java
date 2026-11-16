@@ -34,6 +34,7 @@ public class DutiesActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_duties);
+        Nav.attach(this, R.id.nav_duties);
 
         adapter = new TextAdapter();
         adapter.setListener(new TextAdapter.Listener() {

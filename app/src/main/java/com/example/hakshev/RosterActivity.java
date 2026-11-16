@@ -39,15 +39,11 @@ public class RosterActivity extends BaseActivity {
         edit = getIntent().getBooleanExtra(EXTRA_EDIT, false);
         tvGreeting = findViewById(R.id.tvGreeting);
         tvPresent = findViewById(R.id.tvPresent);
-        findViewById(R.id.navRow).setVisibility(edit ? View.GONE : View.VISIBLE);
+        if (!edit) Nav.attach(this, R.id.nav_soldiers);
         findViewById(R.id.headerMain).setVisibility(edit ? View.GONE : View.VISIBLE);
         findViewById(R.id.titleEdit).setVisibility(edit ? View.VISIBLE : View.GONE);
         findViewById(R.id.btnAdd).setVisibility(edit ? View.VISIBLE : View.GONE);
-        findViewById(R.id.btnOverview).setOnClickListener(v -> startActivity(new Intent(this, MainActivity.class)));
-        findViewById(R.id.btnCounters).setOnClickListener(v -> startActivity(new Intent(this, CountersActivity.class)));
-        findViewById(R.id.btnDuties).setOnClickListener(v -> startActivity(new Intent(this, DutiesActivity.class)));
-        findViewById(R.id.btnInspections).setOnClickListener(v -> startActivity(new Intent(this, InspectionActivity.class)));
-        findViewById(R.id.btnSettings).setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
+        findViewById(R.id.headerMain).setOnClickListener(v -> startActivity(new Intent(this, MainActivity.class)));
         spSquad = findViewById(R.id.spSquad);
         spStatus = findViewById(R.id.spStatus);
         tvCount = findViewById(R.id.tvCount);

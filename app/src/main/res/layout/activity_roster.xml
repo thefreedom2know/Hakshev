@@ -31,59 +31,6 @@
             android:textSize="15sp" />
     </LinearLayout>
 
-    <HorizontalScrollView
-        android:id="@+id/navRow"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:scrollbars="none">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCounters"
-                style="@style/HkButtonOutlined"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="6dp"
-                android:text="@string/tile_counters" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnDuties"
-                style="@style/HkButtonOutlined"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="6dp"
-                android:text="@string/tile_duties" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnInspections"
-                style="@style/HkButtonOutlined"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="6dp"
-                android:text="@string/tile_inspections" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnOverview"
-                style="@style/HkButtonOutlined"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="6dp"
-                android:text="@string/nav_overview" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSettings"
-                style="@style/HkButtonOutlined"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tile_settings" />
-        </LinearLayout>
-    </HorizontalScrollView>
-
     <TextView
         android:id="@+id/titleEdit"
         style="@style/HkTitle"

@@ -18,6 +18,7 @@ public class CountersActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_counters);
+        Nav.attach(this, R.id.nav_counters);
 
         adapter = new TextAdapter();
         adapter.setListener(new TextAdapter.Listener() {

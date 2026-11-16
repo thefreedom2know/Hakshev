@@ -45,6 +45,7 @@ public class InspectionActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inspection);
+        Nav.attach(this, R.id.nav_inspections);
         spTemplate = findViewById(R.id.spTemplate);
         tvHint = findViewById(R.id.tvHint);
         rowRun = findViewById(R.id.rowRun);

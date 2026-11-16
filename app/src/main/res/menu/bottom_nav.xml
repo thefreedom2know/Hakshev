@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_soldiers"
+        android:icon="@drawable/ic_nav_soldiers"
+        android:title="@string/tile_roster" />
+    <item
+        android:id="@+id/nav_counters"
+        android:icon="@drawable/ic_nav_counters"
+        android:title="@string/tile_counters" />
+    <item
+        android:id="@+id/nav_duties"
+        android:icon="@drawable/ic_nav_duties"
+        android:title="@string/tile_duties" />
+    <item
+        android:id="@+id/nav_inspections"
+        android:icon="@drawable/ic_nav_inspections"
+        android:title="@string/tile_inspections" />
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/ic_nav_settings"
+        android:title="@string/tile_settings" />
+</menu>

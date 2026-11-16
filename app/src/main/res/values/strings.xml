@@ -273,7 +273,7 @@
     <string name="edit_soldiers">עריכת נתוני חיילים</string>
     <string name="nav_edit_soldiers">עריכת נתוני חיילים</string>
     <string name="nav_overview">סקירה</string>
-    <string name="present_of">נוכחים %1$d מתוך %2$d</string>
+    <string name="present_of">נוכחים %1$d מתוך %2$d · לחץ לסקירה</string>
     <string name="roster_empty_hint">אין עדיין חיילים. הוסף אותם דרך הגדרות ← עריכת נתוני חיילים.</string>
     <string name="default_for_all">ברירת מחדל לכל חייל: כל החיילים (גם חדשים) נכללים בספירה אוטומטית</string>
     <string name="cannot_remove_default">זו ספירת ברירת מחדל: כל החיילים נכללים בה. כדי להסיר, בטל את "ברירת מחדל" בעריכת הספירה.</string>
