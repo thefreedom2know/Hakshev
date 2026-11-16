@@ -83,6 +83,7 @@ public class CounterActivity extends BaseActivity {
 
     /** IO thread. */
     private void reload() {
+        Counters.ensureDefaults(this);
         CounterDef d = Db.dao(this).counter(counterId);
         if (d == null) {
             runOnUiThread(this::finish);

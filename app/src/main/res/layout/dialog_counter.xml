@@ -52,6 +52,14 @@
         android:orientation="vertical" />
 
     <CheckBox
+        android:id="@+id/cbDefault"
+        style="@style/HkBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="56dp"
+        android:text="@string/default_for_all" />
+
+    <CheckBox
         android:id="@+id/cbAll"
         style="@style/HkBody"
         android:layout_width="match_parent"

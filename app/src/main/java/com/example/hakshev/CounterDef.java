@@ -37,6 +37,10 @@ public class CounterDef {
     @ColumnInfo(defaultValue = "0")
     public int reasonMode;
 
+    /** True = every soldier (including new ones) is in this counter automatically. */
+    @ColumnInfo(defaultValue = "0")
+    public boolean forAll;
+
     // ---- sync ----
     public String uid = java.util.UUID.randomUUID().toString();
     @ColumnInfo(defaultValue = "0")

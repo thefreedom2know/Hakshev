@@ -209,6 +209,7 @@ public class SoldierActivity extends BaseActivity {
 
     /** IO thread. */
     private void loadCounters() {
+        Counters.ensureDefaults(this);
         List<CounterDef> mine = Db.dao(this).countersOf(soldierId);
         List<Counters.Row> rows = Counters.soldierRows(this, soldier, mine, System.currentTimeMillis());
         runOnUiThread(() -> {

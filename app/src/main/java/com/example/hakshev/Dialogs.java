@@ -81,6 +81,8 @@ public final class Dialogs {
         ViewGroup formConvert = v.findViewById(R.id.formConvert);
         CheckBox cbAll = v.findViewById(R.id.cbAll);
         cbAll.setVisibility(isNew ? View.VISIBLE : View.GONE);
+        CheckBox cbDefault = v.findViewById(R.id.cbDefault);
+        cbDefault.setChecked(def.forAll);
         EditText etConvertAt = Ui.addField(a, formConvert, R.string.label_convert_at,
                 def.convertAt > 0 ? String.valueOf(def.convertAt) : "", NUMBER);
         EditText etConvertTo = Ui.addField(a, formConvert, R.string.label_convert_to, convertName, TEXT);
@@ -127,6 +129,7 @@ public final class Dialogs {
                     def.unit = etUnit.getText().toString().trim();
                     def.target = Math.max(0, Ui.parseInt(etTarget.getText(), 0));
                     def.period = Periods.ALL[Math.max(0, spPeriod.getSelectedItemPosition())];
+                    def.forAll = cbDefault.isChecked();
                     def.kind = Math.max(0, spKind.getSelectedItemPosition());
                     def.reasonMode = Math.max(0, spReason.getSelectedItemPosition());
                     if (def.kind == CounterDef.KIND_CHECK) {
@@ -165,6 +168,7 @@ public final class Dialogs {
                             for (Soldier s : dao.allSoldiers()) all.add(new CounterMember(id, s.id));
                             Track.addMembers(dao, all);
                         }
+                        Counters.ensureDefaults(a);
                         final long finalId = id;
                         a.runOnUiThread(() -> onSaved.accept(finalId));
                     });
@@ -328,6 +332,10 @@ public final class Dialogs {
                                 .show())
                         .setPositiveButton(R.string.close, null)
                         .setNeutralButton(R.string.remove_from_counter, (d, w) -> Db.IO.execute(() -> {
+                            if (def.forAll) {
+                                a.runOnUiThread(() -> Ui.toast(a, R.string.cannot_remove_default));
+                                return;
+                            }
                             Track.memberRemoved(Db.dao(a), def.id, s.id);
                             Db.dao(a).removeMember(def.id, s.id);
                             a.runOnUiThread(onChanged);

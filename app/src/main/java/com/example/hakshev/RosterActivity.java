@@ -115,6 +115,7 @@ public class RosterActivity extends BaseActivity {
 
     /** Runs on the IO thread. */
     private void reload() {
+        Counters.ensureDefaults(this);
         List<Soldier> list = Db.dao(this).allSoldiers();
         runOnUiThread(() -> {
             all = list;

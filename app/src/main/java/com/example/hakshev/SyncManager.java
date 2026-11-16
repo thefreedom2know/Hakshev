@@ -542,6 +542,7 @@ public final class SyncManager {
         j.put("to", convertToUid);
         j.put("kind", d.kind);
         j.put("rm", d.reasonMode);
+        j.put("fa", d.forAll);
         return j;
     }
 
@@ -554,5 +555,6 @@ public final class SyncManager {
         d.convertAt = j.optInt("at", 0);
         d.kind = j.optInt("kind", 0);
         d.reasonMode = j.optInt("rm", 0);
+        d.forAll = j.optBoolean("fa", false);
     }
 }

@@ -167,6 +167,21 @@ public final class Counters {
                 def.convertAt * conversions, def.name, conversions, target.name);
     }
 
+    /** Puts every soldier into the counters marked "default for everyone". IO thread. */
+    public static void ensureDefaults(Context c) {
+        AppDao dao = Db.dao(c);
+        List<Soldier> all = null;
+        for (CounterDef def : dao.counters()) {
+            if (!def.forAll) continue;
+            if (all == null) all = dao.allSoldiers();
+            java.util.Set<Long> have = new java.util.HashSet<>();
+            for (Soldier s : dao.members(def.id)) have.add(s.id);
+            List<CounterMember> missing = new ArrayList<>();
+            for (Soldier s : all) if (!have.contains(s.id)) missing.add(new CounterMember(def.id, s.id));
+            if (!missing.isEmpty()) Track.addMembers(dao, missing);
+        }
+    }
+
     /** Sum over the members of the counter in the current period. */
     public static int groupTotal(Context c, CounterDef def, long now) {
         AppDao dao = Db.dao(c);
