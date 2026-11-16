@@ -15,8 +15,15 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Roster: filter by squad / status, quick water and status changes, bulk actions. */
+/**
+ * Main screen: the soldiers. Tapping one opens the counters screen for that soldier.
+ * With EXTRA_EDIT (opened from settings) it is the place to add and edit soldier data.
+ */
 public class RosterActivity extends BaseActivity {
+    public static final String EXTRA_EDIT = "edit";
+
+    private boolean edit;
+    private TextView tvGreeting, tvPresent;
     private Spinner spSquad, spStatus;
     private TextView tvCount;
     private SoldierAdapter adapter;
@@ -29,6 +36,18 @@ public class RosterActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_roster);
+        edit = getIntent().getBooleanExtra(EXTRA_EDIT, false);
+        tvGreeting = findViewById(R.id.tvGreeting);
+        tvPresent = findViewById(R.id.tvPresent);
+        findViewById(R.id.navRow).setVisibility(edit ? View.GONE : View.VISIBLE);
+        findViewById(R.id.headerMain).setVisibility(edit ? View.GONE : View.VISIBLE);
+        findViewById(R.id.titleEdit).setVisibility(edit ? View.VISIBLE : View.GONE);
+        findViewById(R.id.btnAdd).setVisibility(edit ? View.VISIBLE : View.GONE);
+        findViewById(R.id.btnOverview).setOnClickListener(v -> startActivity(new Intent(this, MainActivity.class)));
+        findViewById(R.id.btnCounters).setOnClickListener(v -> startActivity(new Intent(this, CountersActivity.class)));
+        findViewById(R.id.btnDuties).setOnClickListener(v -> startActivity(new Intent(this, DutiesActivity.class)));
+        findViewById(R.id.btnInspections).setOnClickListener(v -> startActivity(new Intent(this, InspectionActivity.class)));
+        findViewById(R.id.btnSettings).setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
         spSquad = findViewById(R.id.spSquad);
         spStatus = findViewById(R.id.spStatus);
         tvCount = findViewById(R.id.tvCount);
@@ -37,7 +56,8 @@ public class RosterActivity extends BaseActivity {
             @Override
             public void onOpen(Soldier s) {
                 startActivity(new Intent(RosterActivity.this, SoldierActivity.class)
-                        .putExtra(SoldierActivity.EXTRA_ID, s.id));
+                        .putExtra(SoldierActivity.EXTRA_ID, s.id)
+                        .putExtra(SoldierActivity.EXTRA_EDIT, edit));
             }
 
             @Override
@@ -80,13 +100,17 @@ public class RosterActivity extends BaseActivity {
 
         findViewById(R.id.btnBulkPresent).setOnClickListener(v -> confirmBulkPresent());
         findViewById(R.id.btnAdd).setOnClickListener(v ->
-                startActivity(new Intent(this, SoldierActivity.class)));
+                startActivity(new Intent(this, SoldierActivity.class).putExtra(SoldierActivity.EXTRA_EDIT, true)));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Db.IO.execute(this::reload);
+        if (!edit) SyncManager.syncIfDue(this);
+        Db.IO.execute(() -> {
+            if (!edit) Db.housekeeping(this);
+            reload();
+        });
     }
 
     /** Runs on the IO thread. */
@@ -94,6 +118,10 @@ public class RosterActivity extends BaseActivity {
         List<Soldier> list = Db.dao(this).allSoldiers();
         runOnUiThread(() -> {
             all = list;
+            if (!edit) {
+                tvGreeting.setText(getString(R.string.greeting, Prefs.commander(this)));
+                tvPresent.setText(getString(R.string.present_of, Alerts.headcount(list), list.size()));
+            }
             rebuildSquadFilter();
             applyFilter();
         });
@@ -126,7 +154,9 @@ public class RosterActivity extends BaseActivity {
             filtered.add(s);
         }
         adapter.setItems(filtered);
-        tvCount.setText(getString(R.string.roster_count, filtered.size(), all.size()));
+        tvCount.setText(all.isEmpty() && !edit
+                ? getString(R.string.roster_empty_hint)
+                : getString(R.string.roster_count, filtered.size(), all.size()));
     }
 
     private void confirmBulkPresent() {

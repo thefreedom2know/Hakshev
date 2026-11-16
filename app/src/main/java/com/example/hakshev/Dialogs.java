@@ -4,14 +4,18 @@ import android.app.Activity;
 import android.text.InputType;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
+
+import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.LongConsumer;
 
 /** Dialogs for creating counters, adding amounts and reading history. */
@@ -40,6 +44,8 @@ public final class Dialogs {
                         base.period = f[1];
                         base.target = Ui.parseInt(f[2], 0);
                         base.unit = f[3];
+                        if (f.length > 4) base.kind = Ui.parseInt(f[4], 0);
+                        if (f.length > 5) base.reasonMode = Ui.parseInt(f[5], 0);
                     }
                     counterForm(a, base, true, id -> onCreated.accept(id), null);
                 })
@@ -85,6 +91,28 @@ public final class Dialogs {
                 def.target > 0 ? String.valueOf(def.target) : "", NUMBER);
         Ui.setSpinner(spPeriod, a, Periods.labels(a));
         spPeriod.setSelection(Status.indexOf(Periods.ALL, def.period));
+        Spinner spKind = v.findViewById(R.id.spKind);
+        Ui.setSpinner(spKind, a, new String[]{a.getString(R.string.kind_count), a.getString(R.string.kind_check)});
+        spKind.setSelection(Math.max(0, Math.min(1, def.kind)));
+        Spinner spReason = v.findViewById(R.id.spReason);
+        Ui.setSpinner(spReason, a, new String[]{a.getString(R.string.reason_none),
+                a.getString(R.string.reason_optional), a.getString(R.string.reason_required)});
+        spReason.setSelection(Math.max(0, Math.min(2, def.reasonMode)));
+        View targetBox = Ui.fieldBox(etTarget);
+        View unitBox = Ui.fieldBox(etUnit);
+        spKind.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                int vis = position == CounterDef.KIND_CHECK ? View.GONE : View.VISIBLE;
+                targetBox.setVisibility(vis);
+                unitBox.setVisibility(vis);
+                formConvert.setVisibility(vis);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
 
         MaterialAlertDialogBuilder b = new MaterialAlertDialogBuilder(a)
                 .setTitle(isNew ? R.string.new_counter : R.string.edit_counter)
@@ -99,8 +127,15 @@ public final class Dialogs {
                     def.unit = etUnit.getText().toString().trim();
                     def.target = Math.max(0, Ui.parseInt(etTarget.getText(), 0));
                     def.period = Periods.ALL[Math.max(0, spPeriod.getSelectedItemPosition())];
+                    def.kind = Math.max(0, spKind.getSelectedItemPosition());
+                    def.reasonMode = Math.max(0, spReason.getSelectedItemPosition());
+                    if (def.kind == CounterDef.KIND_CHECK) {
+                        def.target = 0;
+                        def.unit = "";
+                    }
                     if (def.createdAt == 0) def.createdAt = System.currentTimeMillis();
-                    int convertAt = Math.max(0, Ui.parseInt(etConvertAt.getText(), 0));
+                    int convertAt = def.kind == CounterDef.KIND_CHECK
+                            ? 0 : Math.max(0, Ui.parseInt(etConvertAt.getText(), 0));
                     String convertTo = etConvertTo.getText().toString().trim();
                     boolean everyone = cbAll.isChecked();
                     Db.IO.execute(() -> {
@@ -151,26 +186,105 @@ public final class Dialogs {
 
     // ----------------------------------------------------------------- entries
 
-    /** Adds an amount (can be negative) with an optional note. */
+    /** Asks for a reason when the counter wants one (mode 1 = optional, 2 = required). */
+    private static void askNote(Activity a, String title, int mode, Consumer<String> onNote) {
+        if (mode == 0) {
+            onNote.accept("");
+            return;
+        }
+        View v = a.getLayoutInflater().inflate(R.layout.dialog_form, null);
+        ViewGroup form = v.findViewById(R.id.form);
+        EditText et = Ui.addField(a, form, mode == 2 ? R.string.label_reason_required : R.string.label_reason,
+                "", TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        AlertDialog dlg = new MaterialAlertDialogBuilder(a)
+                .setTitle(title)
+                .setView(v)
+                .setPositiveButton(R.string.save, null)
+                .setNegativeButton(R.string.cancel, null)
+                .create();
+        dlg.setOnShowListener(x -> dlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(b -> {
+            String text = et.getText().toString().trim();
+            if (mode == 2 && text.isEmpty()) {
+                et.setError(a.getString(R.string.reason_required_msg));
+                return;
+            }
+            dlg.dismiss();
+            onNote.accept(text);
+        }));
+        dlg.show();
+    }
+
+    /** +1 / -1 buttons: saves at once, or first asks for the reason when the counter wants one. */
+    public static void quickDelta(Activity a, CounterDef def, Soldier s, int delta, Runnable afterOnIo) {
+        askNote(a, def.name + " — " + s.fullName, def.reasonMode, note -> {
+            CounterEntry e = entry(a, def.id, s.id, delta);
+            e.note = note;
+            Counters.addEntries(a, java.util.Collections.singletonList(e), afterOnIo);
+        });
+    }
+
+    /** Tap on a row: a custom amount with a reason, or done / not done for a done-list. */
     public static void addAmount(Activity a, CounterDef def, Soldier s, Runnable onDone) {
+        if (def.kind == CounterDef.KIND_CHECK) {
+            toggleDone(a, def, s, onDone);
+            return;
+        }
         View v = a.getLayoutInflater().inflate(R.layout.dialog_form, null);
         ViewGroup form = v.findViewById(R.id.form);
         EditText etAmount = Ui.addField(a, form, R.string.label_amount, "1", SIGNED);
-        EditText etNote = Ui.addField(a, form, R.string.label_reason, "",
+        EditText etNote = Ui.addField(a, form,
+                def.reasonMode == 2 ? R.string.label_reason_required : R.string.label_reason, "",
                 TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-        new MaterialAlertDialogBuilder(a)
+        AlertDialog dlg = new MaterialAlertDialogBuilder(a)
                 .setTitle(def.name + " — " + s.fullName)
                 .setView(v)
-                .setPositiveButton(R.string.save, (d, w) -> {
-                    int amount = Ui.parseInt(etAmount.getText(), 0);
-                    if (amount == 0) return;
-                    CounterEntry e = entry(a, def.id, s.id, amount);
-                    e.note = etNote.getText().toString().trim();
-                    Counters.addEntries(a, java.util.Collections.singletonList(e),
-                            () -> a.runOnUiThread(onDone));
-                })
+                .setPositiveButton(R.string.save, null)
                 .setNegativeButton(R.string.cancel, null)
-                .show();
+                .create();
+        dlg.setOnShowListener(x -> dlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(b -> {
+            int amount = Ui.parseInt(etAmount.getText(), 0);
+            if (amount == 0) return;
+            String note = etNote.getText().toString().trim();
+            if (def.reasonMode == 2 && note.isEmpty()) {
+                etNote.setError(a.getString(R.string.reason_required_msg));
+                return;
+            }
+            dlg.dismiss();
+            CounterEntry e = entry(a, def.id, s.id, amount);
+            e.note = note;
+            Counters.addEntries(a, java.util.Collections.singletonList(e),
+                    () -> a.runOnUiThread(onDone));
+        }));
+        dlg.show();
+    }
+
+    /** Done-list: mark as done (with optional details such as a grade), or undo the mark. */
+    private static void toggleDone(Activity a, CounterDef def, Soldier s, Runnable onDone) {
+        Db.IO.execute(() -> {
+            long[] r = Periods.range(def.period, def.createdAt, System.currentTimeMillis(), 0);
+            int value = Db.dao(a).total(def.id, s.id, r[0], r[1]);
+            a.runOnUiThread(() -> {
+                if (value <= 0) {
+                    askNote(a, def.name + " — " + s.fullName, Math.max(1, def.reasonMode), note -> {
+                        CounterEntry e = entry(a, def.id, s.id, 1);
+                        e.note = note;
+                        Counters.addEntries(a, java.util.Collections.singletonList(e),
+                                () -> a.runOnUiThread(onDone));
+                    });
+                } else {
+                    new MaterialAlertDialogBuilder(a)
+                            .setMessage(a.getString(R.string.confirm_unmark, s.fullName))
+                            .setPositiveButton(R.string.yes, (d, w) -> {
+                                CounterEntry e = entry(a, def.id, s.id, -value);
+                                e.note = a.getString(R.string.note_unmarked);
+                                Counters.addEntries(a, java.util.Collections.singletonList(e),
+                                        () -> a.runOnUiThread(onDone));
+                            })
+                            .setNegativeButton(R.string.cancel, null)
+                            .show();
+                }
+            });
+        });
     }
 
     public static CounterEntry entry(Activity a, long counterId, long soldierId, int delta) {

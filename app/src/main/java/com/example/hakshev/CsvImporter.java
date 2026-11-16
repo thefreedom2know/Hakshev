@@ -34,7 +34,8 @@ public final class CsvImporter {
             Soldier s = new Soldier();
             s.fullName = col(cols, 0);
             if (s.fullName.isEmpty()) continue;
-            s.personalNumber = col(cols, 1);
+            String num = col(cols, 1);
+            s.personalNumber = num.matches("\\d{7}") ? num : "";
             s.phone = col(cols, 2);
             s.squad = col(cols, 3);
             s.updatedAt = System.currentTimeMillis();

@@ -69,6 +69,8 @@ public class CountAdapter extends RecyclerView.Adapter<CountAdapter.VH> {
             listener.onLongClick(r);
             return true;
         });
+        h.minus.setVisibility(r.check ? View.GONE : View.VISIBLE);
+        h.plus.setVisibility(r.check ? View.GONE : View.VISIBLE);
         h.minus.setOnClickListener(v -> listener.onDelta(r, -1));
         h.plus.setOnClickListener(v -> listener.onDelta(r, 1));
     }

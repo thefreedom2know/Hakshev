@@ -112,9 +112,10 @@
         <item>💧 מימיות|DAY|4|מימיות</item>
         <item>⏱️ שעות ביציאה|TOTAL|0|שעות</item>
         <item>🛡️ שמירות נוספות|WEEK|0|</item>
+        <item>📝 מבחן ת.א|TOTAL|0||1|1</item>
         <item>📝 מבחנים שעברו|TOTAL|0|</item>
-        <item>🔥 סש"ט|TOTAL|0|</item>
-        <item>⚖️ עונשים והערות משמעת|TOTAL|0|</item>
+        <item>🔥 סש"ט|TOTAL|0||0|1</item>
+        <item>⚖️ עונשים והערות משמעת|TOTAL|0||0|2</item>
         <item>🎓 נוכחות בשיעורים|WEEK|0|</item>
     </string-array>
 
@@ -252,4 +253,26 @@
     <string name="sync_error">הסנכרון נכשל: %1$s</string>
     <string name="sync_not_joined">לא מחובר ליחידה משותפת</string>
     <string name="sync_started">מסנכרן…</string>
+
+    <!-- done-lists, reasons, main screen -->
+    <string name="check_done">✓ בוצע</string>
+    <string name="check_not_done">✗ לא בוצע</string>
+    <string name="n_done">%1$d בוצעו</string>
+    <string name="label_kind">סוג</string>
+    <string name="kind_count">ספירה (מספר לכל חייל)</string>
+    <string name="kind_check">רשימת ביצוע (בוצע / לא בוצע)</string>
+    <string name="label_reason_mode">סיבה</string>
+    <string name="reason_none">בלי סיבה</string>
+    <string name="reason_optional">לבקש סיבה (אפשר לדלג)</string>
+    <string name="reason_required">סיבה חובה</string>
+    <string name="label_reason_required">סיבה (חובה)</string>
+    <string name="reason_required_msg">צריך לכתוב סיבה</string>
+    <string name="confirm_unmark">לבטל את הסימון "בוצע" של %1$s?</string>
+    <string name="note_unmarked">הסימון בוטל</string>
+    <string name="personal_number_7">מספר אישי חייב להיות בדיוק 7 ספרות</string>
+    <string name="edit_soldiers">עריכת נתוני חיילים</string>
+    <string name="nav_edit_soldiers">עריכת נתוני חיילים</string>
+    <string name="nav_overview">סקירה</string>
+    <string name="present_of">נוכחים %1$d מתוך %2$d</string>
+    <string name="roster_empty_hint">אין עדיין חיילים. הוסף אותם דרך הגדרות ← עריכת נתוני חיילים.</string>
 </resources>

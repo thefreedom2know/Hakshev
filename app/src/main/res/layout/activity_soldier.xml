@@ -46,6 +46,12 @@
             android:textStyle="bold"
             android:visibility="gone" />
 
+        <LinearLayout
+            android:id="@+id/viewArea"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
         <TextView
             style="@style/HkSection"
             android:layout_width="match_parent"
@@ -73,6 +79,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/add_counter_to_soldier" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/editArea"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
         <TextView
             style="@style/HkSection"
@@ -192,5 +206,6 @@
             android:layout_marginTop="4dp"
             android:text="@string/delete_soldier"
             android:textColor="@color/hk_alert" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

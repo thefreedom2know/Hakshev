@@ -36,7 +36,6 @@ public class MainActivity extends BaseActivity {
 
         findViewById(R.id.btnReport).setOnClickListener(v -> chooseReport());
         findViewById(R.id.btnCounters).setOnClickListener(v -> startActivity(new Intent(this, CountersActivity.class)));
-        findViewById(R.id.btnRoster).setOnClickListener(v -> startActivity(new Intent(this, RosterActivity.class)));
         findViewById(R.id.btnDuties).setOnClickListener(v -> startActivity(new Intent(this, DutiesActivity.class)));
         findViewById(R.id.btnInspections).setOnClickListener(v -> startActivity(new Intent(this, InspectionActivity.class)));
         findViewById(R.id.btnSettings).setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
@@ -52,15 +51,8 @@ public class MainActivity extends BaseActivity {
     private void refresh() {
         final Context c = getApplicationContext();
         Db.IO.execute(() -> {
-            // Auto-wipe after a long period of inactivity (optional, off by default).
-            int wipeDays = Prefs.wipeDays(c);
-            long last = Prefs.lastActive(c);
-            if (wipeDays > 0 && last > 0
-                    && System.currentTimeMillis() - last > wipeDays * 86_400_000L) {
-                Db.wipeAll(c);
-            }
+            Db.housekeeping(c);
             AppDao dao = Db.dao(c);
-            Db.ensureSeed(c);
             List<Soldier> list = dao.allSoldiers();
             long now = System.currentTimeMillis();
             List<CounterDef> counters = dao.counters();
@@ -70,8 +62,10 @@ public class MainActivity extends BaseActivity {
                 int total = Counters.groupTotal(c, def, now);
                 CounterDef unitOnly = new CounterDef();
                 unitOnly.unit = def.unit;
+                String totalText = def.kind == CounterDef.KIND_CHECK
+                        ? c.getString(R.string.n_done, total) : Counters.valueText(unitOnly, total);
                 sb.append("• ").append(def.name).append(" (").append(Periods.label(c, def.period))
-                        .append("): ").append(Counters.valueText(unitOnly, total))
+                        .append("): ").append(totalText)
                         .append(" · ").append(c.getString(R.string.n_soldiers, members)).append("\n");
             }
             String counterText = sb.length() == 0 ? c.getString(R.string.counters_empty) : sb.toString().trim();

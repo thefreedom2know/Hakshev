@@ -28,6 +28,15 @@ public class CounterDef {
     @ColumnInfo(defaultValue = "0")
     public long convertToId;
 
+    public static final int KIND_COUNT = 0;
+    public static final int KIND_CHECK = 1;
+    /** KIND_COUNT = a number per soldier, KIND_CHECK = done / not done (e.g. a test passed). */
+    @ColumnInfo(defaultValue = "0")
+    public int kind;
+    /** 0 = no reason asked, 1 = ask for a reason (can be skipped), 2 = reason is required. */
+    @ColumnInfo(defaultValue = "0")
+    public int reasonMode;
+
     // ---- sync ----
     public String uid = java.util.UUID.randomUUID().toString();
     @ColumnInfo(defaultValue = "0")

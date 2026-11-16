@@ -540,6 +540,8 @@ public final class SyncManager {
         j.put("created", d.createdAt);
         j.put("at", d.convertAt);
         j.put("to", convertToUid);
+        j.put("kind", d.kind);
+        j.put("rm", d.reasonMode);
         return j;
     }
 
@@ -550,5 +552,7 @@ public final class SyncManager {
         d.unit = j.optString("unit", "");
         d.createdAt = j.optLong("created", 0);
         d.convertAt = j.optInt("at", 0);
+        d.kind = j.optInt("kind", 0);
+        d.reasonMode = j.optInt("rm", 0);
     }
 }

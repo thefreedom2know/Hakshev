@@ -66,6 +66,14 @@ How it works:
 - Two commanders who each created a counter with the same name get two counters; delete one.
 - Not tested against a live Firebase project yet.
 
+## Main screen, done-lists and reasons
+- The app opens on the **soldier list**. Tap a soldier to add counts / punishments or mark things as done.
+  Counters, duties, inspections, overview and settings are the buttons above the list.
+  Soldier data (add / edit / delete) is in Settings > *Edit soldier data*.
+- A personal number must be exactly 7 digits (leave it empty if unknown).
+- A counter can be a **count** (a number per soldier) or a **done-list** (done / not done, e.g. a test), with optional details such as a grade.
+- Each counter can ask for a **reason**: none, optional or required. The reason is saved with the entry and shown in the history.
+
 ## Not implemented yet
 - Multi-commander roles (squad / sergeant / platoon commander): every commander in a unit can currently read and change everything.
 - Biometric unlock.

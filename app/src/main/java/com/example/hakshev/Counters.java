@@ -21,6 +21,8 @@ public final class Counters {
         public String sub = "";
         public String valueText = "";
         public boolean reached;
+        /** Done-list row: shows done / not done instead of a number. */
+        public boolean check;
         public int value;
         public int target;
         /** What to show in the colored circle: soldier name or counter name. */
@@ -32,8 +34,15 @@ public final class Counters {
         return def.unit.isEmpty() ? s : s + " " + def.unit;
     }
 
+    public static String valueText(Context c, CounterDef def, int value) {
+        if (def.kind == CounterDef.KIND_CHECK) {
+            return c.getString(value > 0 ? R.string.check_done : R.string.check_not_done);
+        }
+        return valueText(def, value);
+    }
+
     private static String previousText(Context c, CounterDef def, int prevValue) {
-        return c.getString(R.string.previous_period, valueText(def, prevValue));
+        return c.getString(R.string.previous_period, valueText(c, def, prevValue));
     }
 
     /** Rows for every member of a counter (counter screen). */
@@ -56,8 +65,9 @@ public final class Counters {
             r.avatarText = s.fullName;
             r.value = v;
             r.target = def.target;
-            r.valueText = valueText(def, v);
-            r.reached = def.target > 0 && v >= def.target;
+            r.check = def.kind == CounterDef.KIND_CHECK;
+            r.valueText = valueText(c, def, v);
+            r.reached = r.check ? v > 0 : def.target > 0 && v >= def.target;
             if (prevMap != null) r.sub = previousText(c, def, get(prevMap, s.id));
             rows.add(r);
         }
@@ -78,8 +88,9 @@ public final class Counters {
             r.avatarText = def.name;
             r.value = v;
             r.target = def.target;
-            r.valueText = valueText(def, v);
-            r.reached = def.target > 0 && v >= def.target;
+            r.check = def.kind == CounterDef.KIND_CHECK;
+            r.valueText = valueText(c, def, v);
+            r.reached = r.check ? v > 0 : def.target > 0 && v >= def.target;
             if (!Periods.TOTAL.equals(def.period)) {
                 long[] prev = Periods.range(def.period, def.createdAt, now, -1);
                 r.sub = previousText(c, def, dao.total(def.id, s.id, prev[0], prev[1]));
@@ -162,7 +173,10 @@ public final class Counters {
         long[] cur = Periods.range(def.period, def.createdAt, now, 0);
         Map<Long, Integer> map = toMap(dao.totals(def.id, cur[0], cur[1]));
         int sum = 0;
-        for (Soldier s : dao.members(def.id)) sum += get(map, s.id);
+        for (Soldier s : dao.members(def.id)) {
+            int v = get(map, s.id);
+            sum += def.kind == CounterDef.KIND_CHECK ? (v > 0 ? 1 : 0) : v;
+        }
         return sum;
     }
 

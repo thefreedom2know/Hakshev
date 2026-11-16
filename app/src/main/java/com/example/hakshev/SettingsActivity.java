@@ -47,6 +47,9 @@ public class SettingsActivity extends BaseActivity {
             Ui.toast(this, R.string.saved);
         });
 
+        findViewById(R.id.btnEditSoldiers).setOnClickListener(v ->
+                startActivity(new android.content.Intent(this, RosterActivity.class)
+                        .putExtra(RosterActivity.EXTRA_EDIT, true)));
         findViewById(R.id.btnImport).setOnClickListener(v ->
                 picker.launch(new String[]{"text/*", "application/csv", "application/vnd.ms-excel"}));
 

@@ -36,6 +36,13 @@
             android:text="@string/save" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnEditSoldiers"
+            style="@style/HkButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/edit_soldiers" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnImport"
             style="@style/HkButtonOutlined"
             android:layout_width="match_parent"

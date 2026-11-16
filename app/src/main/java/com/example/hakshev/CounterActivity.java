@@ -28,6 +28,7 @@ public class CounterActivity extends BaseActivity {
     private List<Soldier> members = new ArrayList<>();
     private CountAdapter adapter;
     private TextView tvTitle, tvRange;
+    private List<Counters.Row> lastRows = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +41,8 @@ public class CounterActivity extends BaseActivity {
         adapter = new CountAdapter(new CountAdapter.Listener() {
             @Override
             public void onDelta(Counters.Row row, int delta) {
-                CounterEntry e = Dialogs.entry(CounterActivity.this, counterId, row.soldierId, delta);
-                Counters.addEntries(CounterActivity.this, java.util.Collections.singletonList(e),
-                        CounterActivity.this::reload);
+                Soldier s = soldierById(row.soldierId);
+                if (s != null && def != null) Dialogs.quickDelta(CounterActivity.this, def, s, delta, CounterActivity.this::reload);
             }
 
             @Override
@@ -100,6 +100,7 @@ public class CounterActivity extends BaseActivity {
                 range += "\n" + getString(R.string.conversion_info, d.convertAt, target.name);
             }
             tvRange.setText(range);
+            lastRows = rows;
             adapter.setItems(rows);
         });
     }
@@ -113,11 +114,19 @@ public class CounterActivity extends BaseActivity {
                 .setMessage(getString(R.string.confirm_plus_all, members.size()))
                 .setPositiveButton(R.string.yes, (d, w) -> {
                     List<CounterEntry> entries = new ArrayList<>();
-                    for (Soldier s : members) entries.add(Dialogs.entry(this, counterId, s.id, 1));
+                    for (Soldier s : members) {
+                        if (def != null && def.kind == CounterDef.KIND_CHECK && isDone(s.id)) continue;
+                        entries.add(Dialogs.entry(this, counterId, s.id, 1));
+                    }
                     Counters.addEntries(this, entries, this::reload);
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
+    }
+
+    private boolean isDone(long soldierId) {
+        for (Counters.Row r : lastRows) if (r.soldierId == soldierId) return r.value > 0;
+        return false;
     }
 
     private void addMembers() {

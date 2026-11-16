@@ -24,6 +24,8 @@ import java.util.Set;
 /** Soldier profile plus the counters this soldier takes part in. */
 public class SoldierActivity extends BaseActivity {
     public static final String EXTRA_ID = "soldier_id";
+    /** True = edit the soldier's data. False = the screen where counters are added. */
+    public static final String EXTRA_EDIT = "edit";
 
     private static final int TEXT = InputType.TYPE_CLASS_TEXT;
     private static final int PHONE = InputType.TYPE_CLASS_PHONE;
@@ -47,6 +49,9 @@ public class SoldierActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_soldier);
         soldierId = getIntent().getLongExtra(EXTRA_ID, 0);
+        boolean edit = getIntent().getBooleanExtra(EXTRA_EDIT, false) || soldierId == 0;
+        findViewById(R.id.viewArea).setVisibility(edit ? View.GONE : View.VISIBLE);
+        findViewById(R.id.editArea).setVisibility(edit ? View.VISIBLE : View.GONE);
 
         tvTitle = findViewById(R.id.tvTitle);
         tvAvatar = findViewById(R.id.tvAvatar);
@@ -59,6 +64,7 @@ public class SoldierActivity extends BaseActivity {
         ViewGroup personal = findViewById(R.id.formPersonal);
         etName = Ui.addField(this, personal, R.string.label_name, "", TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         etPersonal = Ui.addField(this, personal, R.string.label_personal_number, "", InputType.TYPE_CLASS_NUMBER);
+        etPersonal.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(7)});
         etPhone = Ui.addField(this, personal, R.string.label_phone, "", PHONE);
         etParentPhone = Ui.addField(this, personal, R.string.label_parent_phone, "", PHONE);
         etShoe = Ui.addField(this, personal, R.string.label_shoe, "", TEXT);
@@ -80,8 +86,8 @@ public class SoldierActivity extends BaseActivity {
         countAdapter = new CountAdapter(new CountAdapter.Listener() {
             @Override
             public void onDelta(Counters.Row row, int delta) {
-                CounterEntry e = Dialogs.entry(SoldierActivity.this, row.counterId, soldierId, delta);
-                Counters.addEntries(SoldierActivity.this, java.util.Collections.singletonList(e),
+                CounterDef def = counterById(row.counterId);
+                if (def != null) Dialogs.quickDelta(SoldierActivity.this, def, soldier, delta,
                         SoldierActivity.this::loadCounters);
             }
 
@@ -117,8 +123,6 @@ public class SoldierActivity extends BaseActivity {
             tvTitle.setText(R.string.new_soldier);
             Ui.avatar(tvAvatar, "+", "new");
             findViewById(R.id.btnDelete).setVisibility(View.GONE);
-            findViewById(R.id.btnAddCounter).setVisibility(View.GONE);
-            tvNoCounters.setText(R.string.save_first_for_counters);
             Ui.setSpinner(spSquad, this, squads);
             updateExpiryButton();
         } else {
@@ -264,7 +268,12 @@ public class SoldierActivity extends BaseActivity {
             return;
         }
         soldier.fullName = name;
-        soldier.personalNumber = etPersonal.getText().toString().trim();
+        String personal = etPersonal.getText().toString().trim();
+        if (!personal.isEmpty() && !personal.matches("\\d{7}")) {
+            etPersonal.setError(getString(R.string.personal_number_7));
+            return;
+        }
+        soldier.personalNumber = personal;
         soldier.phone = etPhone.getText().toString().trim();
         soldier.parentPhone = etParentPhone.getText().toString().trim();
         soldier.shoeSize = etShoe.getText().toString().trim();

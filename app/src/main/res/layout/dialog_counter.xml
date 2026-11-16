@@ -15,10 +15,32 @@
         style="@style/HkBody"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="@string/label_kind" />
+
+    <Spinner style="@style/HkSpinner"
+        android:id="@+id/spKind"
+        android:layout_width="match_parent"
+        android:layout_height="56dp" />
+
+    <TextView
+        style="@style/HkBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/label_period" />
 
     <Spinner style="@style/HkSpinner"
         android:id="@+id/spPeriod"
+        android:layout_width="match_parent"
+        android:layout_height="56dp" />
+
+    <TextView
+        style="@style/HkBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/label_reason_mode" />
+
+    <Spinner style="@style/HkSpinner"
+        android:id="@+id/spReason"
         android:layout_width="match_parent"
         android:layout_height="56dp" />
 

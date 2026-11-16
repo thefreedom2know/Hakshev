@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
         entities = {
                 Soldier.class, CounterDef.class, CounterMember.class, CounterEntry.class,
                 Duty.class, ChecklistTemplate.class, InspectionRun.class, Tombstone.class},
-        version = 4,
+        version = 5,
         exportSchema = false)
 public abstract class Db extends RoomDatabase {
     public abstract AppDao dao();
@@ -33,6 +33,15 @@ public abstract class Db extends RoomDatabase {
         public void migrate(SupportSQLiteDatabase db) {
             db.execSQL("ALTER TABLE counters ADD COLUMN convertAt INTEGER NOT NULL DEFAULT 0");
             db.execSQL("ALTER TABLE counters ADD COLUMN convertToId INTEGER NOT NULL DEFAULT 0");
+        }
+    };
+
+    /** Adds the counter kind (count / done-list) and the reason mode. */
+    private static final Migration MIGRATION_4_5 = new Migration(4, 5) {
+        @Override
+        public void migrate(SupportSQLiteDatabase db) {
+            db.execSQL("ALTER TABLE counters ADD COLUMN kind INTEGER NOT NULL DEFAULT 0");
+            db.execSQL("ALTER TABLE counters ADD COLUMN reasonMode INTEGER NOT NULL DEFAULT 0");
         }
     };
 
@@ -76,7 +85,7 @@ public abstract class Db extends RoomDatabase {
                             // Version 1 was a development build that never shipped.
                             // From version 2 on, real migrations must be written.
                             .fallbackToDestructiveMigrationFrom(true, 1)
-                            .addMigrations(MIGRATION_2_3, MIGRATION_3_4)
+                            .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                             .build();
                 }
             }
@@ -86,6 +95,16 @@ public abstract class Db extends RoomDatabase {
 
     public static AppDao dao(Context c) {
         return get(c).dao();
+    }
+
+    /** Optional auto-wipe after long inactivity, then default data. Call on {@link #IO}. */
+    public static void housekeeping(Context c) {
+        int wipeDays = Prefs.wipeDays(c);
+        long last = Prefs.lastActive(c);
+        if (wipeDays > 0 && last > 0 && System.currentTimeMillis() - last > wipeDays * 86_400_000L) {
+            wipeAll(c);
+        }
+        ensureSeed(c);
     }
 
     /** Seeds the default checklist templates when none exist. Call on {@link #IO}. */

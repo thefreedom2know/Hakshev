@@ -34,6 +34,13 @@ public final class Ui {
         return et;
     }
 
+    /** The whole labelled box (TextInputLayout) around a field made by {@link #addField}. */
+    public static View fieldBox(EditText et) {
+        View v = et;
+        while (v.getParent() instanceof View && !(v instanceof TextInputLayout)) v = (View) v.getParent();
+        return v;
+    }
+
     public static void setSpinner(Spinner sp, Context c, String[] items) {
         ArrayAdapter<String> a = new ArrayAdapter<>(c, R.layout.item_spinner, items);
         a.setDropDownViewResource(R.layout.item_spinner);

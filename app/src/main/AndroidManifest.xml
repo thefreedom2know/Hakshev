@@ -16,15 +16,15 @@
         android:theme="@style/Theme.Hakshev">
 
         <activity
-            android:name=".MainActivity"
+            android:name=".RosterActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".MainActivity" android:exported="false" />
         <activity android:name=".LockActivity" android:exported="false" />
-        <activity android:name=".RosterActivity" android:exported="false" />
         <activity android:name=".SoldierActivity" android:exported="false" />
         <activity android:name=".CountersActivity" android:exported="false" />
         <activity android:name=".CounterActivity" android:exported="false" />
